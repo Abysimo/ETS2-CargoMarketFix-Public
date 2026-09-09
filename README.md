@@ -80,4 +80,4 @@ For offline maintenance tests, additionally configure `-DCMF_BUILD_TESTS=ON -DCM
 
 ## License
 
-Licensing information will be provided before public release. License selection is pending.
+Licensed under the MIT License. See [LICENSE](LICENSE).

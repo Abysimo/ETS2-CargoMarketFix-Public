@@ -38,4 +38,4 @@ The private development repository remains canonical. Never assume PUBLIC -> PRI
 
 Do not import private Git history, raw executable/disassembly/memory dumps, logs, ETL, SDK/game assets, saves/profiles or local backups. Keep local build/package outputs untracked. Documentation-only work must not change gameplay source, build metadata or release configuration; do not rebuild or start a research test campaign unnecessarily.
 
-License status: **LICENSE_SELECTION_PENDING**. Do not select or add a license without an explicit user decision. Resolve licensing separately before public release.
+License status: **MIT License, explicitly approved by the user**. See LICENSE. The license gate is satisfied; final ChatGPT review and explicit user publication approval remain required. Do not change the selected license without an explicit user decision.

@@ -42,7 +42,11 @@ The sanitized release build was validated offline: **95/95 maintenance cases** p
 
 | File | Bytes | SHA256 |
 | --- | ---: | --- |
-| CargoMarketFix.dll | 316928 | `EF5A96BD382B0EBEA03485A68D57C7FAE07A428EEF614334F1A913241A89073D` |
-| ETS2-CargoMarketFix-v1.0.0-ETS2-1.57.2.7.zip | 159422 | `AD9AAC24B69D36623D29A4BBC73021EBF8E3B4BD6AF13372466DC5CBE37E0974` |
+| CargoMarketFix.dll | 316928 | `0CC2F6290ABCB670218927B7BCC49D74E153CF688865CAEB0FC05C1FDA1B6ABA` |
+| ETS2-CargoMarketFix-v1.0.0-ETS2-1.57.2.7.zip | 160141 | `8937E1950C9B446DB356FD9E6D91AE5B60EB18F7288D7C8266EB8BF04F2C5357` |
 
-The ZIP contains only the DLL, INI and README. [SHA256SUMS.txt](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/releases/v1.0.0/SHA256SUMS.txt) contains the same checksums and is prepared as a separate Release asset; it is not inside the ZIP.
+The ZIP contains exactly the DLL, INI, README and LICENSE. [SHA256SUMS.txt](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/releases/v1.0.0/SHA256SUMS.txt) contains the same checksums and is prepared as a separate Release asset; it is not inside the ZIP.
+
+## License
+
+Licensed under the MIT License. Copyright (c) 2026 Abysimo. The standard license text is included in the package and in [LICENSE](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/LICENSE).
