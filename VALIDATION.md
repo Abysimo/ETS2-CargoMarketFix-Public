@@ -7,7 +7,7 @@ This is a fresh source snapshot, not a history export. The production refresh-sp
 
 CAP4 remains the fixed two-byte change at RVA `0x006CE618`: `73 0A` to `90 90`, with four generation attempts. The normal-minute spread remains at `0x003EC647`, using 60 balanced contiguous buckets and `game minute % 60`. There is no persistent scheduler state, backlog, query observer or alteration of the bulk/activation paths beyond CAP4.
 
-## Offline checks
+## Initial snapshot offline checks (historical)
 
 Release x64, MSVC 19.51, Windows SDK 10.0.28000, static CRT. The required SDK headers were supplied locally, not included in the repository. No game process was launched and no deployed files were changed.
 
@@ -24,7 +24,7 @@ The native suites' `default_disabled` cases refer to `tests/disabled.ini`, not t
 
 Native fixtures verify exact CAP4 bytes, four attempts, balanced complete hourly coverage, original continuations, register/FP preservation, normal restoration, exception propagation, containment and unsafe-thread-range rejection. Game-image inputs are mapped read-only with execution disabled. This is not a new real-game performance certification of the packaging-only build.
 
-## Local DLL identity
+## Initial snapshot DLL identity (historical)
 
 - Size: 316928 bytes.
 - SHA256: `2718E19B6FFA0FAAEDA550D61748992955C0F2A98F71DF7592A099BCE3B3BA8E`.
@@ -36,4 +36,16 @@ The DLL and local ZIP are deliberately not versioned or uploaded. License select
 
 The rebuilt bridge's code and unwind sections match the working implementation byte-for-byte. Its code-section SHA256 is `802A24864C844588F7FBC6868898B8248C9598F3DC7D11AF6B6BCD82850A912A`.
 
-Local package: `ETS2-CargoMarketFix-v1.0.0-ETS2-1.57.zip`, 158390 bytes, SHA256 `99CD8F8CA84F1CB34A95304E03F161F0873A89009B23F96FA5F33B40DBE49D42`. It contains only the DLL, supplied INI and README. Source files and package printable strings passed credential/private-identifier checks. The source tree contains no SDK headers, game binaries, assets, saves, research archive or raw dumps. The sole build script invokes local compiler/build tools and file copying only, with no network or credential operations.
+Historical local package, NOT for publication: `ETS2-CargoMarketFix-v1.0.0-ETS2-1.57.zip`, 158390 bytes, SHA256 `99CD8F8CA84F1CB34A95304E03F161F0873A89009B23F96FA5F33B40DBE49D42`. It contains only the DLL, supplied INI and README. Source files and package printable strings passed credential/private-identifier checks. The source tree contains no SDK headers, game binaries, assets, saves, research archive or raw dumps. The sole build script invokes local compiler/build tools and file copying only, with no network or credential operations.
+
+## Exact-build release package preparation
+
+A clean Release x64 rebuild of the unchanged source and build configuration completed for the exact-build asset naming workflow. The maintenance suite ran once: **95/95**, four suites, 1.73 seconds. No game launch, deployment or new practical performance test occurred.
+
+The rebuilt DLL remains 316928 bytes. Its raw SHA256 is `EF5A96BD382B0EBEA03485A68D57C7FAE07A428EEF614334F1A913241A89073D`, different from the preceding DLL solely because of linker metadata. All differing bytes lie in the PE/COFF TimeDateStamp field at file offset 272 and IMAGE_DEBUG_DIRECTORY.TimeDateStamp at offset 263028. Both fields changed from 1788977674 to 1788979136. The two fields were located by parsing the headers, not by masking arbitrary differing bytes.
+
+After zeroing only those two timestamp fields in memory, the complete files are byte-identical, with normalized SHA256 `81A2CFF236C0F6E1A967EE43501830A249372FDBB5FA4B3EA1221E4D72CDC247`. No artifact bytes were edited. Code, other data, unwind tables, resources, relocations and exports are unchanged. Raw output is therefore not bit-reproducible across link times with this configuration; the new raw hash is explicitly recorded, not silently substituted.
+
+Exports remain exactly `scs_telemetry_init` and `scs_telemetry_shutdown`. Supplied INI remains byte-identical to source. The new ZIP includes the current user-facing README and uses the exact supported-build filename. Current sizes/checksums are maintained in [v1.0.0 notes](releases/v1.0.0/RELEASE_NOTES.md) and [SHA256SUMS](releases/v1.0.0/SHA256SUMS.txt), not the historical family-only package above.
+
+All artifacts remain local and unapproved for publication. License selection, final review and explicit publication approval remain blocking requirements. Adding the selected license or changing packaged documentation requires repackaging, fresh checksums and a new artifact scan before publication.

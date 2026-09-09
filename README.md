@@ -17,6 +17,12 @@ Version **1.0.0** limits generation attempts to four (CAP4) and spreads normal c
 
 Windows x64 only. The plugin is **exact-build gated**: the executable hash and patch signatures must match. If ETS2 updates to an unsupported executable, it fails closed and does not apply the patch. Other 1.57 executables are not automatically supported. Check this table and available releases after every game update; future-version rows do not promise support.
 
+## Downloads
+
+Download the release matching your **exact supported ETS2 version** from [GitHub Releases](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases), when available. Never use a release built for another executable. For v1.0.0, the package name is `ETS2-CargoMarketFix-v1.0.0-ETS2-1.57.2.7.zip`.
+
+The current supported/tested row includes practical large-map, owned-trailer testing. Future releases may instead say **Supported / structurally validated**: executable identity, patch sites, native tests and safety checks passed, but the large-map scenario was not yet available for practical testing. That does not mean fully tested; consult each release's verification status.
+
 ## Installation
 
 1. Close Euro Truck Simulator 2.
