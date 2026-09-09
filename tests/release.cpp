@@ -6,6 +6,8 @@
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
+#include <fstream>
+#include <iterator>
 
 static unsigned cases = 0;
 static void check(bool ok, const char* name) {
@@ -14,9 +16,9 @@ static void check(bool ok, const char* name) {
 }
 int main(int argc, char** argv) {
     try {
-        if (argc != 3) return 2;
+        if (argc != 4) return 2;
         auto c = cmf::load_config(argv[1]);
-        check(std::strcmp(cmf::kPluginVersion, "1.1.0") == 0, "R01_release_version");
+        check(std::strcmp(cmf::kPluginVersion, "1.2.0") == 0, "R01_release_version");
         check(c.enabled && c.cap4_install && c.cap4_enabled && !c.cap4_refusal(), "R02_release_CAP4_on");
         check(c.refresh_spread_install && c.refresh_spread_enabled && c.refresh_spread_minutes == 60 &&
               !c.refresh_spread_refusal(), "R03_release_spread_on");
@@ -42,6 +44,10 @@ int main(int argc, char** argv) {
         check(cmf::cap4::target_rva == 0x006CE618 && cmf::spread::target_rva == 0x003EC647,
               "R13_fixed_patch_targets");
         check(cap4.stop(log) && spread.stop(log), "R14_empty_cleanup");
+        std::ifstream source(argv[1],std::ios::binary),built(argv[3],std::ios::binary);
+        check(source.good()&&built.good()&&
+            std::string(std::istreambuf_iterator<char>(source),{})==
+            std::string(std::istreambuf_iterator<char>(built),{}),"R15_built_INI_parity");
         std::printf("TOTAL %u release cases\n", cases);
         return 0;
     } catch (const std::exception& e) {

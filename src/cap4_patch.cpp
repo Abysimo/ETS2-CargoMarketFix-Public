@@ -26,6 +26,8 @@ bool readable(const void* address,std::size_t bytes) noexcept {
 namespace cap4 {
 bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::Descriptor* build) noexcept {
     if(!fix_builds::known(build))return false;
+    const auto* expected_signature=build->cap4_signature;
+    const auto signature_size=build->cap4_signature_size;
     if(!base||size<sizeof(IMAGE_DOS_HEADER)||!readable(base,sizeof(IMAGE_DOS_HEADER)))return false;
     const auto* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     if(dos->e_magic!=IMAGE_DOS_SIGNATURE||dos->e_lfanew<=0)return false;
@@ -45,9 +47,9 @@ bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::
         const auto& s=sections[i];
         if(std::memcmp(s.Name,".text",5)||(s.Characteristics&IMAGE_SCN_MEM_EXECUTE)==0)continue;
         const auto r=s.VirtualAddress,n=s.Misc.VirtualSize;
-        if(r>size||n>size-r||n<signature.size()||!readable(base+r,n))return false;
-        for(std::size_t j=0;j<=n-signature.size();++j){
-            if(base[r+j]!=signature[0]||std::memcmp(base+r+j,signature.data(),signature.size()))continue;
+        if(r>size||n>size-r||n<signature_size||!readable(base+r,n))return false;
+        for(std::size_t j=0;j<=n-signature_size;++j){
+            if(base[r+j]!=expected_signature[0]||std::memcmp(base+r+j,expected_signature,signature_size))continue;
             if(++matches!=1||r+j!=build->cap4-19)return false;
         }
     }
@@ -56,7 +58,7 @@ bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::
 bool Memory::write(lifecycle::Bytes bytes) noexcept {
     if(!target_||(reinterpret_cast<std::uintptr_t>(target_)&1)||bytes==lifecycle::Bytes::unknown)return false;
     InterlockedExchange16(reinterpret_cast<volatile SHORT*>(target_),
-        bytes==lifecycle::Bytes::original?SHORT(0x0a73):SHORT(-28528));
+        bytes==lifecycle::Bytes::original?static_cast<SHORT>(original_[0]|(original_[1]<<8)):SHORT(-28528));
     return true;
 }
 bool Site::prepare() noexcept {
@@ -81,9 +83,10 @@ bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log,co
     const auto* nt=reinterpret_cast<const IMAGE_NT_HEADERS64*>(base+dos->e_lfanew);
     if(!cap4::validate_image(base,nt->OptionalHeader.SizeOfImage,build)){log.write("CAP4 refused: target signature/bytes mismatch");return false;}
     log.write(std::string("CAP4 target bytes matched; build=")+build->version+
-        "; RVA_decimal="+std::to_string(build->cap4)+"; 73 0A -> 90 90");
+        "; RVA_decimal="+std::to_string(build->cap4)+"; original_word_decimal="+
+        std::to_string(build->cap4_original)+" -> 90 90");
     site_=new(storage_) cap4::Site(base+build->cap4,
-        {reinterpret_cast<std::uintptr_t>(base)+build->generator_begin,build->generator_end-build->generator_begin});
+        {reinterpret_cast<std::uintptr_t>(base)+build->generator_begin,build->generator_end-build->generator_begin},build->cap4_original);
     if(!controller_.install(true,*site_)){
         log.write(std::string("CAP4 installation refused: ")+controller_.reason());return false;
     }
@@ -94,7 +97,7 @@ bool Cap4Patch::stop(Logger& log) noexcept {
     const bool was_live=controller_.may_be_live();
     const bool ok=controller_.stop(*site_);
     if(!ok){log.write(std::string("CAP4 restoration unconfirmed; owner retained: ")+controller_.reason());return false;}
-    if(was_live)log.write("CAP4 restored; original bytes=73 0A");
+    if(was_live)log.write("CAP4 restored; exact original build bytes");
     if(controller_.release_allowed()){
         site_->~Site();site_=nullptr;controller_=lifecycle::Controller{};
     }

@@ -4,7 +4,7 @@
 
 Recurring Cargo Market freezes, typically about once per in-game minute, when using an owned trailer—especially with very large map combinations containing many companies.
 
-Version **1.1.0** retains the four-attempt limit (CAP4) and spreads normal company refresh work across one in-game hour. This eliminated recurring freezes in the practically tested ETS2 1.57.2.7 setup; results with other setups may vary. This release adds structurally validated support for ETS2 1.58.1.4 without changing that implementation.
+Version **1.2.0** retains the four-attempt limit (CAP4) and spreads normal company refresh work across one in-game hour. This eliminated recurring freezes in the practically tested ETS2 1.57.2.7 setup; results with other setups may vary. This release adds structurally validated support for ETS2 1.59.1.3 without changing the fix algorithms.
 
 ## Supported versions
 
@@ -12,23 +12,24 @@ Version **1.1.0** retains the four-attempt limit (CAP4) and spreads normal compa
 | --- | --- | --- |
 | 1.57.2.7 | Supported / practically tested | v1.0.0+ |
 | 1.58.1.4 | Supported / structurally validated | v1.1.0+ |
-| 1.59 | Not supported / not validated | — |
+| 1.59.1.3 | Supported / structurally validated | v1.2.0+ |
 | 1.60 | Not supported / not validated | — |
 
-**Structurally validated** means the exact executable was identified, patch sites were ported, native/maintenance tests passed, and safety/fail-closed checks passed. The original large-map reproduction setup was unavailable for an in-game regression test on 1.58.1.4. Its status is **SUPPORTED / STRUCTURALLY VALIDATED**, not practical in-game re-certification of freeze performance.
+**Structurally validated** means the exact executable was identified, patch sites were ported, native/maintenance tests passed, and safety/fail-closed checks passed. The original very-large-map owned-trailer reproduction setup is only available for ETS2 1.57. Neither 1.58.1.4 nor 1.59.1.3 was practically performance-tested in-game with that setup. Their status is **SUPPORTED / STRUCTURALLY VALIDATED**, not practical in-game re-certification of freeze performance.
 
-Windows x64 only. The plugin is **exact-build gated**: the executable hash and patch signatures must match. If ETS2 updates to an unsupported executable, it fails closed and does not apply the patch. Other 1.57 or 1.58 executables are not automatically supported. Check this table and available releases after every game update; future-version rows do not promise support.
+Windows x64 only. The plugin is **exact-build gated**: the executable hash and patch signatures must match. If ETS2 updates to an unsupported executable, it fails closed and does not apply the patch. Other 1.57, 1.58 or 1.59 executables are not automatically supported. Check this table and available releases after every game update; future-version rows do not promise support.
 
 Exact supported executable SHA256 values:
 
 - 1.57.2.7: `06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9`
 - 1.58.1.4: `25CD132FB72576242C298E5EC5B6D940F2E38EBB183928AC1F16D075256BC644`
+- 1.59.1.3: `E6FE1A58DF9D0BFFF21DCCC12B4F581DC0D3E3B5885DBF62ED05028DE794D35C`
 
 ## Downloads
 
-Download [v1.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.1.0): `ETS2-CargoMarketFix-v1.1.0-ETS2-1.58.1.4.zip`. Despite the asset name highlighting the newly added build, its **single DLL supports both exact builds listed above**. Older v1.0.0 assets remain available unchanged for 1.57.2.7 only. Never use a release for an executable outside its supported set.
+Download [v1.2.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.2.0): `ETS2-CargoMarketFix-v1.2.0-ETS2-1.59.1.3.zip`. Despite the asset name highlighting the newly added build, its **single DLL supports all three exact builds listed above**. Previous v1.0.0 and v1.1.0 assets remain available unchanged with their original supported-build sets. Never use a release for an executable outside its supported set.
 
-Lack of a compatible large-map setup does not prevent a structurally validated compatibility release. The same distinction applies to future ports: support is added only after exact-build validation, and practical testing is claimed only when it actually occurred. The 1.59 and 1.60 rows remain unsupported.
+Lack of a compatible large-map setup does not prevent a structurally validated compatibility release. The same distinction applies to future ports: support is added only after exact-build validation, and practical testing is claimed only when it actually occurred. ETS2 1.60 remains unsupported.
 
 ## Installation
 

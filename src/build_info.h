@@ -7,7 +7,7 @@
 namespace cmf {
 
 inline constexpr char kPluginVersion[] =
-    "1.1.0";
+    "1.2.0";
 inline constexpr char kTargetEts2Version[] = "1.57.2.7";
 inline constexpr char kExpectedExecutableSha256[] =
     "06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9";
