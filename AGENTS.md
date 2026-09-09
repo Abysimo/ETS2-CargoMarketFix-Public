@@ -8,7 +8,7 @@ Repository: `Abysimo/ETS2-CargoMarketFix-Public`
 
 Role: **PUBLIC RELEASE / DISTRIBUTION SNAPSHOT** — not the development source of truth.
 
-This repository is currently PRIVATE. It may become public only after explicit user approval. Do not change visibility, create tags or publish releases/assets without explicit authorization.
+This repository is PUBLIC following explicit user approval. Do not change visibility, create tags or publish releases/assets without explicit authorization for the task.
 
 ## Allowed release work
 
@@ -34,8 +34,10 @@ The private development repository remains canonical. Never assume PUBLIC -> PRI
 2. Validate the exact new executable and release safety/behavior requirements privately. Do not infer support from a major/minor version number alone.
 3. Obtain user approval for a sanitized release promotion.
 4. Update this repository's supported-version table, README compatibility information, release notes, release package contents and checksums wherever maintained. Include only public-safe source, documentation, configuration and maintenance tests. Scan staged content for secrets, personal data and excluded research artifacts before pushing.
-5. Publish the matching release, tags and assets only when explicitly approved. Source promotion is not permission to change visibility or publish. Keep this repository private until separately approved otherwise.
+5. Publish the matching release, tags and assets only when explicitly approved. Source promotion alone is not permission to change visibility or publish.
+
+Use SUPPORTED / STRUCTURALLY VALIDATED when exact identity, sites, native maintenance and fail-closed checks pass but the original large-map reproduction setup is unavailable. Do not request an unavailable physical test or block a compatibility release solely on that basis. Reserve SUPPORTED / PRACTICALLY TESTED for actual practical evidence. Future unsupported versions remain unsupported until separately validated.
 
 Do not import private Git history, raw executable/disassembly/memory dumps, logs, ETL, SDK/game assets, saves/profiles or local backups. Keep local build/package outputs untracked. Documentation-only work must not change gameplay source, build metadata or release configuration; do not rebuild or start a research test campaign unnecessarily.
 
-License status: **MIT License, explicitly approved by the user**. See LICENSE. The license gate is satisfied; final ChatGPT review and explicit user publication approval remain required. Do not change the selected license without an explicit user decision.
+License status: **MIT License, explicitly approved by the user**. See LICENSE. Release review and explicit user publication approval remain required for each release. Do not change the selected license without an explicit user decision.

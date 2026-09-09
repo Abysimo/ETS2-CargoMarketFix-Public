@@ -24,7 +24,8 @@ bool readable(const void* address,std::size_t bytes) noexcept {
 }
 }
 namespace cap4 {
-bool validate_image(const std::uint8_t* base,std::size_t size) noexcept {
+bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::Descriptor* build) noexcept {
+    if(!fix_builds::known(build))return false;
     if(!base||size<sizeof(IMAGE_DOS_HEADER)||!readable(base,sizeof(IMAGE_DOS_HEADER)))return false;
     const auto* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     if(dos->e_magic!=IMAGE_DOS_SIGNATURE||dos->e_lfanew<=0)return false;
@@ -34,7 +35,7 @@ bool validate_image(const std::uint8_t* base,std::size_t size) noexcept {
     if(nt->Signature!=IMAGE_NT_SIGNATURE||nt->FileHeader.Machine!=IMAGE_FILE_MACHINE_AMD64||
        nt->OptionalHeader.Magic!=IMAGE_NT_OPTIONAL_HDR64_MAGIC||nt->OptionalHeader.SizeOfImage!=size||
        nt->FileHeader.SizeOfOptionalHeader!=sizeof(IMAGE_OPTIONAL_HEADER64)||
-       !nt->FileHeader.NumberOfSections||nt->FileHeader.NumberOfSections>96||size<region_end)return false;
+       !nt->FileHeader.NumberOfSections||nt->FileHeader.NumberOfSections>96||size<build->generator_end)return false;
     const auto so=off+sizeof(IMAGE_NT_HEADERS64);
     const auto sb=nt->FileHeader.NumberOfSections*sizeof(IMAGE_SECTION_HEADER);
     if(so>size||sb>size-so||!readable(base+so,sb))return false;
@@ -47,7 +48,7 @@ bool validate_image(const std::uint8_t* base,std::size_t size) noexcept {
         if(r>size||n>size-r||n<signature.size()||!readable(base+r,n))return false;
         for(std::size_t j=0;j<=n-signature.size();++j){
             if(base[r+j]!=signature[0]||std::memcmp(base+r+j,signature.data(),signature.size()))continue;
-            if(++matches!=1||r+j!=target_rva-19)return false;
+            if(++matches!=1||r+j!=build->cap4-19)return false;
         }
     }
     return matches==1;
@@ -63,13 +64,13 @@ bool Site::prepare() noexcept {
     return !(p&1)&&range_.contains(p)&&range_.contains(p+1)&&memory_.classify()==lifecycle::Bytes::original;
 }
 }
-bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log) noexcept {
+bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log,const fix_builds::Descriptor* build) noexcept {
     if(!config.cap4_install&&!config.cap4_enabled)return true;
     log.write("CAP4 requested; generation budget=4");
     if(const auto* refusal=config.cap4_refusal()){
         log.write(std::string("CAP4 refused: ")+refusal);return false;
     }
-    if(!exact_build){log.write("CAP4 refused: exact build mismatch");return false;}
+    if(!exact_build||!fix_builds::known(build)){log.write("CAP4 refused: exact build mismatch");return false;}
     log.write("CAP4 exact build matched");
     if(site_||controller_.phase()!=lifecycle::Phase::empty){log.write("CAP4 refused: existing owner state");return false;}
     auto* base=reinterpret_cast<std::uint8_t*>(GetModuleHandleW(nullptr));
@@ -78,10 +79,11 @@ bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log) n
     if(dos->e_magic!=IMAGE_DOS_SIGNATURE||dos->e_lfanew<=0||dos->e_lfanew>0x100000||
        !readable(base+dos->e_lfanew,sizeof(IMAGE_NT_HEADERS64))){log.write("CAP4 refused: PE header");return false;}
     const auto* nt=reinterpret_cast<const IMAGE_NT_HEADERS64*>(base+dos->e_lfanew);
-    if(!cap4::validate_image(base,nt->OptionalHeader.SizeOfImage)){log.write("CAP4 refused: target signature/bytes mismatch");return false;}
-    log.write("CAP4 target bytes matched; RVA=0x006CE618; 73 0A -> 90 90");
-    site_=new(storage_) cap4::Site(base+cap4::target_rva,
-        {reinterpret_cast<std::uintptr_t>(base)+cap4::region_begin,cap4::region_end-cap4::region_begin});
+    if(!cap4::validate_image(base,nt->OptionalHeader.SizeOfImage,build)){log.write("CAP4 refused: target signature/bytes mismatch");return false;}
+    log.write(std::string("CAP4 target bytes matched; build=")+build->version+
+        "; RVA_decimal="+std::to_string(build->cap4)+"; 73 0A -> 90 90");
+    site_=new(storage_) cap4::Site(base+build->cap4,
+        {reinterpret_cast<std::uintptr_t>(base)+build->generator_begin,build->generator_end-build->generator_begin});
     if(!controller_.install(true,*site_)){
         log.write(std::string("CAP4 installation refused: ")+controller_.reason());return false;
     }

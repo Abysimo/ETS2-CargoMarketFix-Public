@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "fix_builds.h"
 #include "hook_platform.h"
 #include "hook_quiescence.h"
 #include <array>
@@ -18,7 +19,8 @@ inline constexpr std::array<std::uint8_t,75> signature{
  0x48,0x8d,0x3c,0xc3,0x48,0x3b,0xdf,0x74,0x1d,0x66,0x0f,0x1f,0x84,0,0,0,0,0,
  0x48,0x8b,0x0b,0x48,0x8b,0xd6,0xe8,0x75,0,0x2e,0,0x48,0x83,0xc3,8,0x48,0x3b,0xdf,
  0x75,0xec,0x48,0x8b,0xbc,0x24,0x88,0,0,0,0x48,0x8b,0x5c,0x24,0x70,0x48,0x83,0xc4,0x60,0x5e,0xc3};
-bool validate_image(const std::uint8_t*,std::size_t) noexcept;
+bool validate_image(const std::uint8_t*,std::size_t,
+    const fix_builds::Descriptor* build=&fix_builds::ets157) noexcept;
 
 // One normal CALL/RET plus JRCXZ inside the nine-byte owned padding. The lease
 // protects its return into that padding until the bridge returns. No return
@@ -57,7 +59,8 @@ class RefreshSpread final {
     alignas(spread::Site) unsigned char storage_[sizeof(spread::Site)]{};
     spread::Site* site_=nullptr;
 public:
-    bool start(const PluginConfig&,bool exact_build,Logger&) noexcept;
+    bool start(const PluginConfig&,bool exact_build,Logger&,
+        const fix_builds::Descriptor* build=&fix_builds::ets157) noexcept;
     bool stop(Logger&) noexcept;
 };
 }

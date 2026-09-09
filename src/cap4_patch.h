@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "fix_builds.h"
 #include "hook_platform.h"
 #include "hook_quiescence.h"
 #include <array>
@@ -16,7 +17,8 @@ inline constexpr std::array<std::uint8_t,67> signature{
     0xeb,0x12,0x48,0x8b,0x44,0x24,0x68,0x48,0x89,0x45,0x88,0x48,0x85,0xc0,
     0x0f,0x84,0x73,0x07,0,0};
 // Loaded-image validation; never reads game objects or runs on the game hot path.
-bool validate_image(const std::uint8_t* base,std::size_t size) noexcept;
+bool validate_image(const std::uint8_t* base,std::size_t size,
+    const fix_builds::Descriptor* build=&fix_builds::ets157) noexcept;
 
 // Existing Windows protection/cache backend, with the validated aligned atomic
 // two-byte store. No callback/trampoline becomes callable from the game.
@@ -68,7 +70,8 @@ class Cap4Patch final {
     alignas(cap4::Site) unsigned char storage_[sizeof(cap4::Site)]{};
     cap4::Site* site_=nullptr;
 public:
-    bool start(const PluginConfig&,bool exact_build,Logger&) noexcept;
+    bool start(const PluginConfig&,bool exact_build,Logger&,
+        const fix_builds::Descriptor* build=&fix_builds::ets157) noexcept;
     bool stop(Logger&) noexcept;
     bool potentially_live() const noexcept {return controller_.may_be_live();}
 };

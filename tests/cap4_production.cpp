@@ -1,5 +1,6 @@
 #include "cap4_patch.h"
 #include "logger.h"
+#include "build_info.h"
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
@@ -86,7 +87,9 @@ int main(int argc,char** argv){try{
     HANDLE m=CreateFileMappingW(f,nullptr,PAGE_READONLY|SEC_IMAGE_NO_EXECUTE,0,0,nullptr);need(m!=nullptr,"nonexecuting image mapping");
     auto* mapped=static_cast<const std::uint8_t*>(MapViewOfFile(m,FILE_MAP_READ,0,0,0));need(mapped,"readonly view");
     const auto* md=reinterpret_cast<const IMAGE_DOS_HEADER*>(mapped);const auto* mn=reinterpret_cast<const IMAGE_NT_HEADERS64*>(mapped+md->e_lfanew);
-    check(cmf::cap4::validate_image(mapped,mn->OptionalHeader.SizeOfImage),"CP18_real_image_readonly_NO_EXECUTE_identity");
+    const auto identity=cmf::inspect_executable(argv[3]);
+    const auto* build=cmf::fix_builds::identify(identity.sha256);
+    check(identity.sha256_available&&build&&cmf::cap4::validate_image(mapped,mn->OptionalHeader.SizeOfImage,build),"CP18_real_image_readonly_NO_EXECUTE_identity");
     UnmapViewOfFile(mapped);CloseHandle(m);CloseHandle(f);
     cmf::cap4::Site s(&cap_site,range());cmf::lifecycle::Controller controller;
     check(cap_fixture(10)==10,"CP19_original_semantics");

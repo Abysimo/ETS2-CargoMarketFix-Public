@@ -55,15 +55,16 @@ SCSAPI_RESULT scs_telemetry_init(scs_u32_t version, const scs_telemetry_init_par
             return SCS_RESULT_generic_error;
         }
         const auto executable = cmf::inspect_executable(cmf::process_executable_path());
-        const bool exact = executable.sha256_available &&
-                           executable.sha256 == cmf::kExpectedExecutableSha256;
-        logger.write(std::string("exact_build_1.57.2.7 = ") + (exact ? "true" : "false"));
+        const auto* build = executable.sha256_available ?
+            cmf::fix_builds::identify(executable.sha256) : nullptr;
+        const bool exact = build != nullptr;
+        logger.write(std::string("exact_supported_build = ") + (build ? build->version : "unsupported"));
         if (!exact && (cap_requested || spread_requested)) {
             logger.write("Unsupported executable; no patches installed");
             return SCS_RESULT_generic_error;
         }
-        if ((cap_requested && !cap4.start(config, exact, logger)) ||
-            (spread_requested && !spread.start(config, exact, logger))) {
+        if ((cap_requested && !cap4.start(config, exact, logger, build)) ||
+            (spread_requested && !spread.start(config, exact, logger, build))) {
             stop();
             logger.write("Installation failed closed");
             return SCS_RESULT_generic_error;

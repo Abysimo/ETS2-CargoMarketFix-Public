@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
     try {
         if (argc != 3) return 2;
         auto c = cmf::load_config(argv[1]);
-        check(std::strcmp(cmf::kPluginVersion, "1.0.0") == 0, "R01_release_version");
+        check(std::strcmp(cmf::kPluginVersion, "1.1.0") == 0, "R01_release_version");
         check(c.enabled && c.cap4_install && c.cap4_enabled && !c.cap4_refusal(), "R02_release_CAP4_on");
         check(c.refresh_spread_install && c.refresh_spread_enabled && c.refresh_spread_minutes == 60 &&
               !c.refresh_spread_refusal(), "R03_release_spread_on");
@@ -25,9 +25,9 @@ int main(int argc, char** argv) {
               "R04_observers_off");
         check(c.target_this_build_only && !c.allow_unknown_build && c.fail_closed, "R05_fixed_build_gates");
         const auto game = cmf::inspect_executable(argv[2]);
-        check(game.sha256_available && game.sha256 == cmf::kExpectedExecutableSha256, "R06_exact_game_hash_readonly");
+        check(game.sha256_available && cmf::fix_builds::identify(game.sha256), "R06_exact_game_hash_readonly");
         const auto self = cmf::inspect_executable(cmf::process_executable_path());
-        check(self.sha256_available && self.sha256 != cmf::kExpectedExecutableSha256, "R07_unsupported_host_hash");
+        check(self.sha256_available && !cmf::fix_builds::identify(self.sha256), "R07_unsupported_host_hash");
         cmf::Logger log; cmf::Cap4Patch cap4; cmf::RefreshSpread spread;
         check(!cap4.start(c, false, log) && !spread.start(c, false, log) &&
               !cap4.potentially_live() && !cmf::hook_module_was_pinned(), "R08_unknown_build_no_patch_PIN");

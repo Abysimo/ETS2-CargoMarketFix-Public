@@ -1,5 +1,31 @@
 # Release snapshot validation
 
+## v1.1.0 compatibility release
+
+ETS2 1.57.2.7: **SUPPORTED / PRACTICALLY TESTED**, retained from v1.0.0.
+ETS2 1.58.1.4: **SUPPORTED / STRUCTURALLY VALIDATED**.
+The original very-large-map owned-trailer reproduction setup was unavailable on 1.58; performance was not practically re-certified in-game. No physical test is requested or required solely to compensate for that unavailable setup.
+
+This is a sanitized promotion of the completed compatibility port. Only per-build metadata, exact-hash selection, corresponding signature/range selection, startup identification and minimal maintenance tests changed. No private history, research documents or observation infrastructure were imported. The shared four-attempt CAP4 behavior, 60-bucket bridge, lifecycle/platform backend, supplied enabled INI and MIT license remain unchanged.
+
+| Exact build | Executable SHA256 | CAP4 RVA | Spread gate |
+| --- | --- | --- | --- |
+| 1.57.2.7 | `06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9` | `0x006CE618` | `0x003EC647` |
+| 1.58.1.4 | `25CD132FB72576242C298E5EC5B6D940F2E38EBB183928AC1F16D075256BC644` | `0x006F4CE8` | `0x00407627` |
+
+The 1.58 executable is 49,878,928 bytes. CAP4 retains `73 0A -> 90 90`. The spread gate retains its nine-byte span and original continuation layout. Unknown hashes and cross-build descriptor use are rejected. The 1.58 live-image tests read the installed executable without executing it; retained 1.57 descriptors and install/restore behavior are exercised with authored fixtures.
+
+Release x64 was built from this sanitized repository with MSVC 19.51 and static CRT. One maintenance run passed **122/122 named cases**, five suites, **2.63 seconds**, with no retries: CAP4 37, spread 37, release contract 14, actual-DLL unsupported host 7, and multi-build descriptors/install/restore 27. The release INI enables both fixes; observers are absent from the compiled source list. The host fixture confirms no observer registration and no module PIN on an unsupported executable.
+
+DLL size: **320512 bytes**. SHA256: `86C47F0389E3321976681B1F8947014EAE36B6DE6D54DE6D02C740F1C1110103`.
+Exports exactly `scs_telemetry_init` and `scs_telemetry_shutdown`; dependencies are Windows `bcrypt.dll` and `KERNEL32.dll`. The built INI equals the source INI. Package integrity is recorded in [v1.1.0 checksums](releases/v1.1.0/SHA256SUMS.txt). No ETS2 launch, physical test request or deployment occurred in this promotion task.
+
+The subsequent sections are **historical v1.0.0 preparation records**; their then-pending publication statements do not describe current release status.
+
+The v1.1.0 ZIP is **162725 bytes**, SHA256 `C68D937A95790F31FFA88FC9679933C735011AF7C323C2B3D352308C342268BC`. Its four entries match the reviewed DLL, current README, enabled INI and unchanged MIT LICENSE byte-for-byte. Source/asset checks found no forbidden personal paths, credential patterns, private research payloads or unexpected DLL network endpoints. Binaries, local transcripts, staging files, SDK files and game data are excluded from Git. The v1.0.0 release directory is unchanged.
+
+## Historical v1.0.0 preparation
+
 Version: 1.0.0. Validated executable: ETS2 1.57.2.7, SHA256
 `06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9`.
 

@@ -4,24 +4,31 @@
 
 Recurring Cargo Market freezes, typically about once per in-game minute, when using an owned trailer—especially with very large map combinations containing many companies.
 
-Version **1.0.0** limits generation attempts to four (CAP4) and spreads normal company refresh work across one in-game hour. This eliminated recurring freezes in the tested setup; results with other setups may vary.
+Version **1.1.0** retains the four-attempt limit (CAP4) and spreads normal company refresh work across one in-game hour. This eliminated recurring freezes in the practically tested ETS2 1.57.2.7 setup; results with other setups may vary. This release adds structurally validated support for ETS2 1.58.1.4 without changing that implementation.
 
 ## Supported versions
 
 | ETS2 version | Status | Plugin release |
 | --- | --- | --- |
-| 1.57.2.7 | Supported / tested | v1.0.0 |
-| 1.58 | Not supported / not validated | — |
+| 1.57.2.7 | Supported / practically tested | v1.0.0+ |
+| 1.58.1.4 | Supported / structurally validated | v1.1.0+ |
 | 1.59 | Not supported / not validated | — |
 | 1.60 | Not supported / not validated | — |
 
-Windows x64 only. The plugin is **exact-build gated**: the executable hash and patch signatures must match. If ETS2 updates to an unsupported executable, it fails closed and does not apply the patch. Other 1.57 executables are not automatically supported. Check this table and available releases after every game update; future-version rows do not promise support.
+**Structurally validated** means the exact executable was identified, patch sites were ported, native/maintenance tests passed, and safety/fail-closed checks passed. The original large-map reproduction setup was unavailable for an in-game regression test on 1.58.1.4. Its status is **SUPPORTED / STRUCTURALLY VALIDATED**, not practical in-game re-certification of freeze performance.
+
+Windows x64 only. The plugin is **exact-build gated**: the executable hash and patch signatures must match. If ETS2 updates to an unsupported executable, it fails closed and does not apply the patch. Other 1.57 or 1.58 executables are not automatically supported. Check this table and available releases after every game update; future-version rows do not promise support.
+
+Exact supported executable SHA256 values:
+
+- 1.57.2.7: `06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9`
+- 1.58.1.4: `25CD132FB72576242C298E5EC5B6D940F2E38EBB183928AC1F16D075256BC644`
 
 ## Downloads
 
-Download the release matching your **exact supported ETS2 version** from [GitHub Releases](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases), when available. Never use a release built for another executable. For v1.0.0, the package name is `ETS2-CargoMarketFix-v1.0.0-ETS2-1.57.2.7.zip`.
+Download [v1.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.1.0): `ETS2-CargoMarketFix-v1.1.0-ETS2-1.58.1.4.zip`. Despite the asset name highlighting the newly added build, its **single DLL supports both exact builds listed above**. Older v1.0.0 assets remain available unchanged for 1.57.2.7 only. Never use a release for an executable outside its supported set.
 
-The current supported/tested row includes practical large-map, owned-trailer testing. Future releases may instead say **Supported / structurally validated**: executable identity, patch sites, native tests and safety checks passed, but the large-map scenario was not yet available for practical testing. That does not mean fully tested; consult each release's verification status.
+Lack of a compatible large-map setup does not prevent a structurally validated compatibility release. The same distinction applies to future ports: support is added only after exact-build validation, and practical testing is claimed only when it actually occurred. The 1.59 and 1.60 rows remain unsupported.
 
 ## Installation
 

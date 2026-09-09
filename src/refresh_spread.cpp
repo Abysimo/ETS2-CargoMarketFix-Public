@@ -21,8 +21,11 @@ static bool readable(const void* pointer,std::size_t size) noexcept {
         p=(end<b+m.RegionSize)?end:b+m.RegionSize;
     }return true;
 }
-bool validate_image(const std::uint8_t* base,std::size_t size) noexcept {
-    if(size<region_end||!readable(base,sizeof(IMAGE_DOS_HEADER)))return false;
+bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::Descriptor* build) noexcept {
+    if(!fix_builds::known(build))return false;
+    auto expected=spread::signature;
+    std::memcpy(expected.data()+43,&build->sweep_call_displacement,4);
+    if(size<build->sweep_end||!readable(base,sizeof(IMAGE_DOS_HEADER)))return false;
     const auto* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     if(dos->e_magic!=IMAGE_DOS_SIGNATURE||dos->e_lfanew<=0)return false;
     const auto off=static_cast<std::size_t>(dos->e_lfanew);
@@ -39,10 +42,10 @@ bool validate_image(const std::uint8_t* base,std::size_t size) noexcept {
     for(unsigned i=0;i<nt->FileHeader.NumberOfSections;++i){const auto& s=sections[i];
         if(std::memcmp(s.Name,".text",5)||!(s.Characteristics&IMAGE_SCN_MEM_EXECUTE))continue;
         const auto r=s.VirtualAddress,n=s.Misc.VirtualSize;
-        if(r>size||n>size-r||n<signature.size()||!readable(base+r,n))return false;
-        for(std::size_t j=0;j<=n-signature.size();++j)
-            if(base[r+j]==signature[0]&&!std::memcmp(base+r+j,signature.data(),signature.size()))
-                if(++matches!=1||r+j!=0x003EC62C)return false;
+        if(r>size||n>size-r||n<expected.size()||!readable(base+r,n))return false;
+        for(std::size_t j=0;j<=n-expected.size();++j)
+            if(base[r+j]==expected[0]&&!std::memcmp(base+r+j,expected.data(),expected.size()))
+                if(++matches!=1||r+j!=build->spread-27)return false;
     }return matches==1;
 }
 bool Site::prepare() noexcept {
@@ -81,24 +84,25 @@ bool Site::free_allocation() noexcept {
     relay_=nullptr;return true;
 }
 }
-bool RefreshSpread::start(const PluginConfig& config,bool exact_build,Logger& log) noexcept {
+bool RefreshSpread::start(const PluginConfig& config,bool exact_build,Logger& log,const fix_builds::Descriptor* build) noexcept {
     if(!config.refresh_spread_install&&!config.refresh_spread_enabled)return true;
     if(const auto* reason=config.refresh_spread_refusal()){
         log.write(std::string("Refresh spread refused: ")+reason);return false;}
-    if(!exact_build||site_){log.write("Refresh spread refused: build/owner gate");return false;}
+    if(!exact_build||!fix_builds::known(build)||site_){log.write("Refresh spread refused: build/owner gate");return false;}
     auto* base=reinterpret_cast<std::uint8_t*>(GetModuleHandleW(nullptr));
     if(!spread::readable(base,sizeof(IMAGE_DOS_HEADER)))return false;
     const auto* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     if(dos->e_magic!=IMAGE_DOS_SIGNATURE||dos->e_lfanew<=0||dos->e_lfanew>0x100000||
         !spread::readable(base+dos->e_lfanew,sizeof(IMAGE_NT_HEADERS64)))return false;
     const auto* nt=reinterpret_cast<const IMAGE_NT_HEADERS64*>(base+dos->e_lfanew);
-    if(!spread::validate_image(base,nt->OptionalHeader.SizeOfImage)){
+    if(!spread::validate_image(base,nt->OptionalHeader.SizeOfImage,build)){
         log.write("Refresh spread refused: exact sweep signature");return false;}
-    site_=new(storage_) spread::Site(base+spread::target_rva,
-        {reinterpret_cast<std::uintptr_t>(base)+spread::region_begin,spread::region_end-spread::region_begin});
+    site_=new(storage_) spread::Site(base+build->spread,
+        {reinterpret_cast<std::uintptr_t>(base)+build->sweep_begin,build->sweep_end-build->sweep_begin});
     if(!controller_.install(true,*site_)){
         log.write(std::string("Refresh spread install failed: ")+controller_.reason());return false;}
-    log.write("CMF refresh spread ACTIVE; contract=1; minutes=60; partition=contiguous; normal-only; gate=0x003EC647; CAP4 retained; no backlog; bulk/activation unchanged");
+    log.write(std::string("CMF refresh spread ACTIVE; contract=1; minutes=60; partition=contiguous; normal-only; build=")+build->version+
+        "; gate_RVA_decimal="+std::to_string(build->spread)+"; CAP4 retained; no backlog; bulk/activation unchanged");
     return true;
 }
 bool RefreshSpread::stop(Logger& log) noexcept {

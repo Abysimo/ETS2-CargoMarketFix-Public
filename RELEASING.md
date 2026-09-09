@@ -4,9 +4,9 @@ AGENTS.md is authoritative. This is the release snapshot repository, not the dev
 
 ## Publication gates
 
-License gate: **SATISFIED — MIT License explicitly approved by the user**, included in LICENSE. Publication remains blocked until final ChatGPT repository review is completed and the user explicitly approves publication. Do not change the license without explicit user approval or insert placeholder license text.
+License gate: **SATISFIED — MIT License explicitly approved by the user**, included in LICENSE. Each release requires completed review and explicit publication approval. Do not change the license without explicit user approval or insert placeholder license text.
 
-This document prepares a workflow only. It does not authorize a visibility change, tag creation, GitHub Release, draft Release creation or asset upload. Keep the repository private until separately approved.
+This document describes the workflow; it does not itself authorize publication. The repository is public following approval. The user separately authorized v1.1.0 publication after its release gates pass. Future releases still require their own approval.
 
 ## Independent versions
 
@@ -14,8 +14,8 @@ Plugin versions and ETS2 versions are independent. Use `vMAJOR.MINOR.PATCH` plug
 
 | Plugin version | Mapping / policy |
 | --- | --- |
-| v1.0.0 | ETS2 1.57.2.7, validated |
-| v1.1.0 | Expected first validated ETS2 1.58 support; not implemented or promised |
+| v1.0.0 | ETS2 1.57.2.7: supported / practically tested |
+| v1.1.0 | Retains 1.57.2.7; adds 1.58.1.4: supported / structurally validated |
 | v1.2.0 | Expected first validated ETS2 1.59 support; not implemented or promised |
 | v1.3.0 | Expected first validated ETS2 1.60 support; not implemented or promised |
 
@@ -27,15 +27,15 @@ Create a separate GitHub Release for every plugin release. Do not maintain one f
 
 Every release must specify plugin version, exact supported ETS2 builds and executable hashes, practical-test status, changes/tradeoffs, installation reminder, fail-closed behavior, package filename, DLL SHA256 and ZIP SHA256.
 
-Distinguish **SUPPORTED / PRACTICALLY TESTED** (large-map reproduction and recurring-freeze behavior checked in the game) from **SUPPORTED / STRUCTURALLY VALIDATED** (identity, native sites/tests and safety checks passed, but the practical scenario was unavailable). Never describe the latter as fully tested. Note if a packaging-only DLL was checked offline rather than rerun in-game.
+Distinguish **SUPPORTED / PRACTICALLY TESTED** (large-map reproduction and recurring-freeze behavior checked in the game) from **SUPPORTED / STRUCTURALLY VALIDATED** (identity, native sites/tests and safety checks passed, but the practical scenario was unavailable). Never describe the latter as fully tested. Note if a packaging-only DLL was checked offline rather than rerun in-game. Do not request an unavailable physical test or block structural compatibility releases solely because a newer version lacks the original large-map setup. This policy applies to future ports unless the user says practical testing is possible; it does not pre-authorize support for an unvalidated build.
 
 ## Asset layout
 
-Current planned tag: `v1.0.0` (not created).
+Current release tag: `v1.1.0`. The published `v1.0.0` tag and assets must remain unchanged.
 
-Current release title: **ETS2 Cargo Market Fix v1.0.0 — ETS2 1.57.2.7**.
+Current release title: **ETS2 Cargo Market Fix v1.1.0 — ETS2 1.58.1.4 support**.
 
-Current package: `ETS2-CargoMarketFix-v1.0.0-ETS2-1.57.2.7.zip`.
+Current package: `ETS2-CargoMarketFix-v1.1.0-ETS2-1.58.1.4.zip`. Its name highlights the new build, but the single DLL supports both exact 1.57.2.7 and 1.58.1.4 executables.
 
 Do not publish broad names such as `latest.zip` or the old family-only package name. For a future multi-executable release within one family, use `ETS2-CargoMarketFix-vX.Y.Z-ETS2-<family>-validated-set.zip` and list every exact supported build prominently in the notes and checksum metadata; never imply arbitrary family-wide support.
 
@@ -57,8 +57,8 @@ Maintain per-version notes and `SHA256SUMS.txt` under `releases/<tag>/`. The che
 10. Commit reviewed source/docs/checksums and push. Verify inclusion of the approved license and complete final review. Confirm explicit publication and visibility approval before creating the matching tag/Release or uploading anything.
 11. Once authorized, tag the reviewed release commit, create its matching GitHub Release, use the prepared title/notes, and attach the exact ZIP plus `SHA256SUMS.txt`. Verify live supported-build information, asset bytes/hashes and intended visibility. Never reuse an existing release/tag without explicit direction.
 
-## v1.0.0 readiness
+## Release records
 
-Release notes and checksums are in [releases/v1.0.0](releases/v1.0.0/RELEASE_NOTES.md). Assets remain local and unpublished. The MIT license gate is satisfied. Final ChatGPT review and explicit publication approval remain required.
+Historical published notes/checksums remain in [releases/v1.0.0](releases/v1.0.0/RELEASE_NOTES.md). The new compatibility notes/checksums are in [releases/v1.1.0](releases/v1.1.0/RELEASE_NOTES.md). Keep each release immutable in practice: do not overwrite old assets.
 
 Include the approved LICENSE in every package. Any later change to packaged files requires regenerating the ZIP and its checksums/notes and rescanning the final artifacts before approval. These prepared hashes are not valid for a later modified package. Gameplay source is unchanged by this workflow preparation.

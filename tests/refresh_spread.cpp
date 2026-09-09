@@ -1,6 +1,7 @@
 #include "refresh_spread.h"
 #include "cap4_patch.h"
 #include "logger.h"
+#include "build_info.h"
 #include <vector>
 #include <cstring>
 #include <cstdio>
@@ -72,9 +73,11 @@ int main(int argc,char** argv){try{
     auto* image=static_cast<const std::uint8_t*>(MapViewOfFile(m,FILE_MAP_READ,0,0,0));need(image,"view");
     auto* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
     auto* nt=reinterpret_cast<const IMAGE_NT_HEADERS64*>(image+dos->e_lfanew);
-    check(cmf::spread::validate_image(image,nt->OptionalHeader.SizeOfImage),"RS10_real_exact_sweep_signature");
-    check(cmf::cap4::validate_image(image,nt->OptionalHeader.SizeOfImage),"RS11_CAP4_target_unchanged");
-    check(image[0x3ed746]==0xe8&&image[0x6cc708]==0x48,"RS12_bulk_and_premutation_sites_unmodified");
+    const auto identity=cmf::inspect_executable(argv[3]);
+    const auto* build=cmf::fix_builds::identify(identity.sha256);need(identity.sha256_available&&build,"exact build descriptor");
+    check(cmf::spread::validate_image(image,nt->OptionalHeader.SizeOfImage,build),"RS10_real_exact_sweep_signature");
+    check(cmf::cap4::validate_image(image,nt->OptionalHeader.SizeOfImage,build),"RS11_CAP4_target_unchanged");
+    check(image[build->bulk_call]==0xe8&&image[build->premutation]==0x48,"RS12_bulk_and_premutation_sites_unmodified");
     UnmapViewOfFile(image);CloseHandle(m);CloseHandle(f);
     check(&spread_loop-&spread_site==9&&&spread_finish-&spread_loop==0x14,"RS13_native_layout_original_continuations");
     std::vector<Company> companies(60);std::vector<Company*> ptr;for(auto& x:companies)ptr.push_back(&x);
