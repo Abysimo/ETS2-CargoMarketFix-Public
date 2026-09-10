@@ -1,7 +1,7 @@
-# ETS2 Cargo Market Fix v1.1.1 — ETS2 1.58.1.4
+# ETS2 Cargo Market Fix v1.2.1 — ETS2 1.59.1.3
 
-This release package is specifically for **ETS2 1.58.1.4, Windows x64**.
-Download **ETS2-CargoMarketFix-v1.1.1-ETS2-1.58.1.4.zip** from the [matching release](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.1.1).
+This release package is specifically for **ETS2 1.59.1.3, Windows x64**.
+Download **ETS2-CargoMarketFix-v1.2.1-ETS2-1.59.1.3.zip** from the [matching release](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.2.1).
 
 **SUPPORTED / STRUCTURALLY VALIDATED.**
 
@@ -19,7 +19,7 @@ CAP4 remains fixed at **four current-trailer Cargo Market generation attempts**.
 | --- | --- | --- |
 | 1.57.2.7 | v1.0.1 | Practically tested reference |
 | 1.58.1.4 | v1.1.1 | Structurally validated |
-| 1.59.1.3 | v1.2.0 | Structurally validated |
+| 1.59.1.3 | v1.2.1 | Structurally validated |
 | 1.60.1.7 | v1.3.0 | Structurally validated; prior startup smoke |
 
 Each game version has its own release line and package. Do not substitute a different game's package. Older releases retain their original settings and documentation and remain unchanged. Internally this shared source recognizes the four certified exact hashes below; that does not change this package's single-game release scope.
