@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(CargoMarketFix VERSION 1.2.0 LANGUAGES CXX ASM_MASM)
+project(CargoMarketFix VERSION 1.3.0 LANGUAGES CXX ASM_MASM)
 if(NOT WIN32 OR NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
     message(FATAL_ERROR "Windows x64 with MSVC and MASM is required.")
 endif()
@@ -8,7 +8,7 @@ if(NOT EXISTS "${SCS_SDK_INCLUDE_DIR}/scssdk_telemetry.h")
     message(FATAL_ERROR "Set SCS_SDK_INCLUDE_DIR. The SDK is not bundled or downloaded.")
 endif()
 set(CMF_CORE
-    src/cap4_patch.cpp src/refresh_spread.cpp src/refresh_spread_bridge.asm
+    src/cap4_patch.cpp src/refresh_spread.cpp src/refresh_spread_bridge.asm src/refresh_spread_bridge_v160.asm
     src/hook_lifecycle.cpp src/hook_platform.cpp src/config.cpp
     src/logger.cpp src/build_info.cpp)
 function(cmf_target target)
@@ -42,7 +42,7 @@ if(CMF_BUILD_TESTS)
         cmf_target(cmf_${kind}_tests)
         add_test(NAME ${kind}_native COMMAND cmf_${kind}_tests
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/disabled.ini"
-            "${CMAKE_CURRENT_SOURCE_DIR}/CargoMarketFix.ini" "${CMF_GAME_EXE}")
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_examples/CargoMarketFix.cap4-spread-active.ini" "${CMF_GAME_EXE}")
         set_tests_properties(${kind}_native PROPERTIES TIMEOUT 90)
     endforeach()
     add_executable(cmf_release_tests tests/release.cpp ${CMF_CORE})
@@ -50,7 +50,8 @@ if(CMF_BUILD_TESTS)
     add_dependencies(cmf_release_tests CargoMarketFix)
     add_test(NAME release_contract COMMAND cmf_release_tests
         "${CMAKE_CURRENT_SOURCE_DIR}/CargoMarketFix.ini" "${CMF_GAME_EXE}"
-        "$<TARGET_FILE_DIR:CargoMarketFix>/CargoMarketFix.ini")
+        "$<TARGET_FILE_DIR:CargoMarketFix>/CargoMarketFix.ini"
+        "${CMAKE_CURRENT_SOURCE_DIR}/config_examples/CargoMarketFix.cap4-spread-active.ini")
     add_executable(cmf_host_tests tests/host.cpp)
     cmf_target(cmf_host_tests)
     add_dependencies(cmf_host_tests CargoMarketFix)
@@ -58,4 +59,11 @@ if(CMF_BUILD_TESTS)
     add_executable(cmf_fix_build_tests tests/fix_builds.cpp tests/cap4_159_fixture.asm ${CMF_CORE})
     cmf_target(cmf_fix_build_tests)
     add_test(NAME multi_build_descriptors COMMAND cmf_fix_build_tests)
+    add_executable(cmf_copy2_tests tests/cap4_copy2.cpp ${CMF_CORE})
+    cmf_target(cmf_copy2_tests)
+    add_test(NAME cap4_quiesced_copy2 COMMAND cmf_copy2_tests)
+    add_executable(cmf_spread160_tests tests/spread_v160.cpp tests/spread_v160_fixture.asm tests/refresh_spread_fixture.asm ${CMF_CORE})
+    cmf_target(cmf_spread160_tests)
+    add_test(NAME spread_v160_backend COMMAND cmf_spread160_tests)
+    set_tests_properties(spread_v160_backend PROPERTIES TIMEOUT 120)
 endif()

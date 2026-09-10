@@ -23,6 +23,26 @@ void change(PatchMemory& memory, Bytes replacement, PatchResult& result) noexcep
 }
 }  // namespace
 
+PatchResult repair_original_auxiliaries(PatchMemory& memory) noexcept {
+    PatchResult result;
+    result.before = result.after = memory.classify();
+    if (result.before != Bytes::original) {
+        result.protection_restored = false;
+        result.reason = "auxiliary_target_changed_after_detach";
+        return result; // Do not touch an intervening owner's bytes or protection.
+    }
+    result.cache_synchronized = memory.flush();
+    result.protection_restored = memory.restore_protection();
+    result.after = memory.classify();
+    result.committed = result.after == Bytes::original &&
+        result.cache_synchronized && result.protection_restored;
+    result.reason = result.after != Bytes::original ? "auxiliary_target_changed_after_detach" :
+        result.committed ? "auxiliary_original_verified" :
+        !result.cache_synchronized ? "auxiliary_instruction_cache_flush_failed" :
+        "auxiliary_page_protection_restore_failed";
+    return result;
+}
+
 PatchResult transact(PatchMemory& memory, bool install) noexcept {
     PatchResult result;
     result.before = result.after = memory.classify();
@@ -182,11 +202,17 @@ bool Controller::install(bool requested, Operations& ops) noexcept {
 bool Controller::stop(Operations& ops) noexcept {
     if (phase_ == Phase::empty) return true;
     if (phase_ == Phase::releasable) {
-        if (!last_patch_.protection_restored) {
+        if (!last_patch_.protection_restored || auxiliary_pending_) {
             // Resources are already safely detached. Retry only the separate
             // original-page/cache repair; never republish a continuation.
-            last_patch_ = ops.patch(false);
+            last_patch_ = ops.repair_original_auxiliaries();
+            auxiliary_pending_ = !last_patch_.committed;
             reason_ = last_patch_.reason;
+            if (last_patch_.before != Bytes::original || last_patch_.after != Bytes::original) {
+                original_verified_ = false;
+                phase_ = Phase::retained_until_exit;
+                reason_ = "auxiliary_target_changed_after_detach";
+            }
             return last_patch_.committed;
         }
         return true;

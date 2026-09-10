@@ -1,5 +1,19 @@
 # Release snapshot validation
 
+## v1.3.0 compatibility release
+
+Promoted the already validated private 1.60 patch backends without functional edits: exact descriptors, CAP4 quiesced-copy backend, auxiliary-repair lifecycle safety, Refresh Spread owner and dedicated 1.60 MASM bridge match the validated private source (apart from line endings). The public minimal wrapper/parser remains separate, and no historical observer or membership code is imported. Public version metadata is 1.3.0.
+
+One clean MSVC/MASM x64 Release build and one maintenance run passed: **259/259 named cases, 7/7 suites, 231.87 seconds, no retries**. Suite counts: CAP4 37, legacy spread 37, release contract 17, plugin host 7, four-build descriptors 61, quiesced two-byte backend 37, 1.60 spread backend 63. The backend suites include 1,000 CAP4 install/restore cycles and 100 spread boundary cycles. Unknown-build refusal with patches requested, default-disabled no-install/no-PIN, opt-in example, four exact descriptors, native restoration, rollback, containment, ABI and exception behavior are covered. The private 1183-case campaign was not rerun.
+
+Release DLL: **324608 bytes**, SHA256 `E4DCF6A5335AE642B73DC24616C068A2CCA1ECBF60C0850AA4CE0E5C3810CFE4`. Exports exactly `scs_telemetry_init` and `scs_telemetry_shutdown`. Default source/built INI SHA256 `B8BC2D8AF747AE31F17D7F3F22235C5A155F45A69BF158EB1983DAD209FAF0FF`; CAP4 and Spread are both disabled. The active example enables both, 60 minutes, with no observers. Public source and DLL text were screened for private paths, private version branding, credentials and unexpected endpoints; none were found in promoted source/binary.
+
+The validated private 0.12.0 DLL (522752 bytes; SHA256 `E6BA99AC82E365EDFB7A090CC59A51EE3B288DC82DD307D0992290CDA2BE2FCD`) was used for the live smoke, not the smaller public-only 1.3.0 binary. The private build's full automated suite passed 1183/1183. Live ETS2 1.60.1.7 recognized the expected executable hash, installed CAP4 budget 4 and 60-minute Spread, and remained responsive in the menu 131 seconds after initialization with observers OFF and no observed plugin/crash errors. No repeated initialization occurred.
+
+Qualification: **SUPPORTED / STRUCTURALLY VALIDATED; LIVE STARTUP SMOKE PASSED; GAMEPLAY PERFORMANCE NOT PHYSICALLY VALIDATED.** Clean live shutdown/restoration was not confirmed. Owned-trailer gameplay, actual freeze reduction, sleep/bulk gameplay and offer quality were not tested on 1.60. Offline restoration passes do not fill that live gap. This promotion performed no game launch, deployment or gameplay interaction. No forced termination was used; the previously identified process was already absent when checked.
+
+See [v1.3.0 release notes](releases/v1.3.0/RELEASE_NOTES.md) and its checksums for the final package. Historical sections below retain their original version-specific defaults and validation scope; they do not override v1.3.0's disabled defaults.
+
 ## v1.1.0 compatibility release
 
 ETS2 1.57.2.7: **SUPPORTED / PRACTICALLY TESTED**, retained from v1.0.0.

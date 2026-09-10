@@ -55,7 +55,18 @@ bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::
     }
     return matches==1;
 }
+bool Memory::writable() noexcept {
+    if(strategy_==WriteStrategy::quiesced_copy2) {
+        if(!quiesced_||!*quiesced_)return false; // Before VirtualProtect.
+    } else if(strategy_!=WriteStrategy::aligned_atomic16)return false;
+    return platform_.writable();
+}
 bool Memory::write(lifecycle::Bytes bytes) noexcept {
+    if(strategy_==WriteStrategy::quiesced_copy2) {
+        if(!quiesced_||!*quiesced_)return false;
+        return platform_.write(bytes); // Exactly two bytes, alignment-independent.
+    }
+    if(strategy_!=WriteStrategy::aligned_atomic16)return false;
     if(!target_||(reinterpret_cast<std::uintptr_t>(target_)&1)||bytes==lifecycle::Bytes::unknown)return false;
     InterlockedExchange16(reinterpret_cast<volatile SHORT*>(target_),
         bytes==lifecycle::Bytes::original?static_cast<SHORT>(original_[0]|(original_[1]<<8)):SHORT(-28528));
@@ -63,12 +74,15 @@ bool Memory::write(lifecycle::Bytes bytes) noexcept {
 }
 bool Site::prepare() noexcept {
     const auto p=reinterpret_cast<std::uintptr_t>(target_);
-    return !(p&1)&&range_.contains(p)&&range_.contains(p+1)&&memory_.classify()==lifecycle::Bytes::original;
+    const bool valid_strategy=strategy_==WriteStrategy::quiesced_copy2||
+        (strategy_==WriteStrategy::aligned_atomic16&&!(p&1));
+    return valid_strategy&&p!=UINTPTR_MAX&&range_.contains(p)&&range_.contains(p+1)&&
+        memory_.classify()==lifecycle::Bytes::original;
 }
 }
 bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log,const fix_builds::Descriptor* build) noexcept {
     if(!config.cap4_install&&!config.cap4_enabled)return true;
-    log.write("CAP4 requested; generation budget=4");
+    log.write("CAP4 requested; behavior-changing research patch; budget=4");
     if(const auto* refusal=config.cap4_refusal()){
         log.write(std::string("CAP4 refused: ")+refusal);return false;
     }
@@ -86,7 +100,8 @@ bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log,co
         "; RVA_decimal="+std::to_string(build->cap4)+"; original_word_decimal="+
         std::to_string(build->cap4_original)+" -> 90 90");
     site_=new(storage_) cap4::Site(base+build->cap4,
-        {reinterpret_cast<std::uintptr_t>(base)+build->generator_begin,build->generator_end-build->generator_begin},build->cap4_original);
+        {reinterpret_cast<std::uintptr_t>(base)+build->generator_begin,build->generator_end-build->generator_begin},
+        build->cap4_original,build->cap4_write_strategy);
     if(!controller_.install(true,*site_)){
         log.write(std::string("CAP4 installation refused: ")+controller_.reason());return false;
     }

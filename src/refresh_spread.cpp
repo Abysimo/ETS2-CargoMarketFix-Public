@@ -6,6 +6,15 @@
 extern "C" {volatile LONG cmf_refresh_spread_active=0;}
 namespace cmf {
 namespace spread {
+const Layout* layout_for(Strategy strategy) noexcept {
+    switch(strategy){case Strategy::legacy_v157_v159:return &legacy_layout;
+        case Strategy::v160_rcx_rbp:return &v160_layout;}return nullptr;
+}
+bool valid_layout(const Layout& layout) noexcept {
+    const auto* expected=layout_for(layout.strategy);
+    return expected&&layout.span==expected->span&&layout.original==expected->original&&
+        layout.empty_displacement==expected->empty_displacement;
+}
 static bool readable(const void* pointer,std::size_t size) noexcept {
     auto p=reinterpret_cast<std::uintptr_t>(pointer);
     if(!p||size>UINTPTR_MAX-p)return false;
@@ -23,9 +32,29 @@ static bool readable(const void* pointer,std::size_t size) noexcept {
 }
 bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::Descriptor* build) noexcept {
     if(!fix_builds::known(build))return false;
-    auto expected=spread::signature;
-    std::memcpy(expected.data()+43,&build->sweep_call_displacement,4);
-    if(size<build->sweep_end||!readable(base,sizeof(IMAGE_DOS_HEADER)))return false;
+    const auto* layout=layout_for(build->spread_strategy);if(!layout)return false;
+    auto spec=build->spread_signature;
+    if(!spec.bytes){
+        if(build->spread_strategy!=Strategy::legacy_v157_v159)return false;
+        spec={signature.data(),signature.size(),27,43};
+    }
+    return validate_site_image(base,size,build->spread,build->sweep_begin,build->sweep_end,
+        *layout,spec,build->sweep_call_displacement);
+}
+bool validate_site_image(const std::uint8_t* base,std::size_t size,std::uint32_t target,
+    std::uint32_t begin,std::uint32_t end,const Layout& layout,fix_builds::SpreadSignature spec,
+    std::uint32_t call_displacement) noexcept {
+    if(!valid_layout(layout)||!spec.bytes||spec.size>256||spec.size<layout.span||
+        spec.patch_offset>spec.size-layout.span||target<spec.patch_offset||begin>=end||
+        size<end||target<begin||target>=end||layout.span>end-target||
+        target-spec.patch_offset<begin||spec.size>end-(target-spec.patch_offset))return false;
+    std::array<std::uint8_t,256> expected{};std::memcpy(expected.data(),spec.bytes,spec.size);
+    if(spec.call_offset!=SIZE_MAX){
+        if(spec.size<4||spec.call_offset>spec.size-4)return false;
+        std::memcpy(expected.data()+spec.call_offset,&call_displacement,4);
+    }
+    if(std::memcmp(expected.data()+spec.patch_offset,layout.original.data(),layout.span)||
+        !readable(base,sizeof(IMAGE_DOS_HEADER)))return false;
     const auto* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     if(dos->e_magic!=IMAGE_DOS_SIGNATURE||dos->e_lfanew<=0)return false;
     const auto off=static_cast<std::size_t>(dos->e_lfanew);
@@ -42,16 +71,16 @@ bool validate_image(const std::uint8_t* base,std::size_t size,const fix_builds::
     for(unsigned i=0;i<nt->FileHeader.NumberOfSections;++i){const auto& s=sections[i];
         if(std::memcmp(s.Name,".text",5)||!(s.Characteristics&IMAGE_SCN_MEM_EXECUTE))continue;
         const auto r=s.VirtualAddress,n=s.Misc.VirtualSize;
-        if(r>size||n>size-r||n<expected.size()||!readable(base+r,n))return false;
-        for(std::size_t j=0;j<=n-expected.size();++j)
-            if(base[r+j]==expected[0]&&!std::memcmp(base+r+j,expected.data(),expected.size()))
-                if(++matches!=1||r+j!=build->spread-27)return false;
+        if(r>size||n>size-r||n<spec.size||!readable(base+r,n))return false;
+        for(std::size_t j=0;j<=n-spec.size;++j)
+            if(base[r+j]==expected[0]&&!std::memcmp(base+r+j,expected.data(),spec.size))
+                if(++matches!=1||r+j!=target-spec.patch_offset)return false;
     }return matches==1;
 }
 bool Site::prepare() noexcept {
-    if(relay_||memory_.classify()!=lifecycle::Bytes::original)return false;
+    if(relay_||!valid_layout(layout_)||memory_.classify()!=lifecycle::Bytes::original)return false;
     const auto p=reinterpret_cast<std::uintptr_t>(target_);
-    if(!game_.contains(p)||!game_.contains(p+8))return false;
+    if(p>UINTPTR_MAX-(layout_.span-1)||!game_.contains(p)||!game_.contains(p+layout_.span-1))return false;
     // Allocate at allocation-granularity steps, within signed CALL rel32 reach.
     const auto anchor=p&~std::uintptr_t(65535);
     for(std::uintptr_t d=65536;d<0x70000000&&!relay_;d+=65536){
@@ -65,18 +94,25 @@ bool Site::prepare() noexcept {
     const auto delta=reinterpret_cast<std::intptr_t>(relay_)-static_cast<std::intptr_t>(p+5);
     if(delta<INT32_MIN||delta>INT32_MAX)return false;
     relay_[0]=0xff;relay_[1]=0x25;std::memset(relay_+2,0,4);
-    const auto bridge=reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge);
+    const auto bridge=bridge_range().begin;
     std::memcpy(relay_+6,&bridge,8);
     DWORD old=0;
     if(!VirtualProtect(relay_,4096,PAGE_EXECUTE_READ,&old)||!FlushInstructionCache(GetCurrentProcess(),relay_,14))return false;
-    detour_.fill(0x90);detour_[0]=0xe8;detour_[5]=0xe3;detour_[6]=0x16;
+    detour_.fill(0x90);detour_[0]=0xe8;detour_[5]=0xe3;detour_[6]=layout_.empty_displacement;
     const auto displacement=static_cast<std::int32_t>(delta);std::memcpy(detour_.data()+1,&displacement,4);
     return true;
 }
+MemoryRange Site::bridge_range() const noexcept {
+    const auto begin=layout_.strategy==Strategy::v160_rcx_rbp?
+        reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge_v160):reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge);
+    const auto end=layout_.strategy==Strategy::v160_rcx_rbp?
+        reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge_v160_end):reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge_end);
+    return {begin,end-begin};
+}
 bool Site::freeze() noexcept {
-    const auto bridge=reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge);
+    if(!valid_layout(layout_))return false;
     return suspended_.acquire(std::array<MemoryRange,3>{game_,relay_range(),
-        MemoryRange{bridge,reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge_end)-bridge}},freeze_reason);
+        bridge_range()},freeze_reason);
 }
 bool Site::free_allocation() noexcept {
     if(!relay_)return true;
@@ -98,7 +134,8 @@ bool RefreshSpread::start(const PluginConfig& config,bool exact_build,Logger& lo
     if(!spread::validate_image(base,nt->OptionalHeader.SizeOfImage,build)){
         log.write("Refresh spread refused: exact sweep signature");return false;}
     site_=new(storage_) spread::Site(base+build->spread,
-        {reinterpret_cast<std::uintptr_t>(base)+build->sweep_begin,build->sweep_end-build->sweep_begin});
+        {reinterpret_cast<std::uintptr_t>(base)+build->sweep_begin,build->sweep_end-build->sweep_begin},
+        *spread::layout_for(build->spread_strategy));
     if(!controller_.install(true,*site_)){
         log.write(std::string("Refresh spread install failed: ")+controller_.reason());return false;}
     log.write(std::string("CMF refresh spread ACTIVE; contract=1; minutes=60; partition=contiguous; normal-only; build=")+build->version+

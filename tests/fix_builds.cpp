@@ -22,7 +22,7 @@ int main(){try{
     check(!fix_builds::identify(corrupted),"one_hash_digit_fail_closed");
     auto forged=fix_builds::ets158;
     check(!fix_builds::known(&forged),"arbitrary_descriptor_rejected");
-    constexpr std::size_t size=0x730000;
+    constexpr std::size_t size=0x7b0000;
     auto* image=static_cast<std::uint8_t*>(VirtualAlloc(nullptr,size,MEM_COMMIT|MEM_RESERVE,PAGE_READWRITE));
     if(!image)throw std::runtime_error("allocation");
     for(const auto* build:fix_builds::supported){
@@ -36,8 +36,12 @@ int main(){try{
         auto* s=IMAGE_FIRST_SECTION(nt);std::memcpy(s->Name,".text",5);
         s->VirtualAddress=0x1000;s->Misc.VirtualSize=size-0x1000;s->Characteristics=IMAGE_SCN_MEM_EXECUTE;
         std::memcpy(image+build->cap4-19,build->cap4_signature,build->cap4_signature_size);
-        auto sig=spread::signature;std::memcpy(sig.data()+43,&build->sweep_call_displacement,4);
-        std::memcpy(image+build->spread-27,sig.data(),sig.size());
+        auto spec=build->spread_signature;
+        if(!spec.bytes)spec={spread::signature.data(),spread::signature.size(),27,43};
+        std::array<std::uint8_t,256> sig{};std::memcpy(sig.data(),spec.bytes,spec.size);
+        std::memcpy(sig.data()+spec.call_offset,&build->sweep_call_displacement,4);
+        std::memcpy(image+build->spread-spec.patch_offset,sig.data(),spec.size);
+        const auto& layout=*spread::layout_for(build->spread_strategy);
         check(cap4::validate_image(image,size,build),tag+"CAP4_identity");
         check(spread::validate_image(image,size,build),tag+"spread_identity");
         bool isolated=true;
@@ -49,12 +53,12 @@ int main(){try{
         check(!cap4::validate_image(image,size,build),tag+"CAP4_changed_byte_rejected");image[build->cap4]=0x73;
         image[build->spread+3]^=1;
         check(!spread::validate_image(image,size,build),tag+"spread_changed_byte_rejected");image[build->spread+3]^=1;
-        cap4::Site cap(image+build->cap4,{reinterpret_cast<std::uintptr_t>(image)+build->generator_begin,build->generator_end-build->generator_begin},build->cap4_original);
-        spread::Site sweep(image+build->spread,{reinterpret_cast<std::uintptr_t>(image)+build->sweep_begin,build->sweep_end-build->sweep_begin});
+        cap4::Site cap(image+build->cap4,{reinterpret_cast<std::uintptr_t>(image)+build->generator_begin,build->generator_end-build->generator_begin},build->cap4_original,build->cap4_write_strategy);
+        spread::Site sweep(image+build->spread,{reinterpret_cast<std::uintptr_t>(image)+build->sweep_begin,build->sweep_end-build->sweep_begin},layout);
         lifecycle::Controller c,p;
         check(c.install(true,cap)&&image[build->cap4]==0x90&&image[build->cap4+1]==0x90,tag+"CAP4_install");
-        check(p.install(true,sweep)&&image[build->spread]==0xe8&&image[build->spread+5]==0xe3&&image[build->spread+6]==0x16,tag+"spread_install_original_branches");
-        check(p.stop(sweep)&&std::memcmp(image+build->spread,spread::original.data(),9)==0,tag+"spread_restore");
+        check(p.install(true,sweep)&&image[build->spread]==0xe8&&image[build->spread+5]==0xe3&&image[build->spread+6]==layout.empty_displacement,tag+"spread_install_original_branches");
+        check(p.stop(sweep)&&std::memcmp(image+build->spread,layout.original.data(),layout.span)==0,tag+"spread_restore");
         check(c.stop(cap)&&image[build->cap4]==0x73&&image[build->cap4+1]==(build->cap4_original>>8),tag+"CAP4_restore");
         check(cap4::validate_image(image,size,build)&&spread::validate_image(image,size,build),tag+"restored_identity");
     }
@@ -81,8 +85,9 @@ int main(){try{
     check(owner.stop(native)&&(&cap159_site)[0]==0x73&&(&cap159_site)[1]==0x0b,"159_native_exact_restore");
     original=true;for(auto n:inputs)original=original&&cap159_fixture(n)==(n<4?4:(n>10?10:n));
     check(original,"159_native_restored_budget_semantics");
-    check(fix_builds::supported.size()==3&&fix_builds::supported[0]==&fix_builds::ets157&&
-        fix_builds::supported[1]==&fix_builds::ets158&&fix_builds::supported[2]==&fix_builds::ets159,
+    check(fix_builds::supported.size()==4&&fix_builds::supported[0]==&fix_builds::ets157&&
+        fix_builds::supported[1]==&fix_builds::ets158&&fix_builds::supported[2]==&fix_builds::ets159&&
+        fix_builds::supported[3]==&fix_builds::ets160,
         "exact_release_supported_set");
     cap4::Site wrong_original(&cap159_site,{begin,reinterpret_cast<std::uintptr_t>(&cap159_end)-begin},fix_builds::ets158.cap4_original);
     lifecycle::Controller wrong_owner;

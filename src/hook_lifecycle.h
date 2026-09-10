@@ -33,6 +33,9 @@ public:
 };
 
 PatchResult transact(PatchMemory& memory, bool install) noexcept;
+// After detach, auxiliary repair never opens a write transaction. Any byte
+// change requires a full transaction under freshly established quiescence.
+PatchResult repair_original_auxiliaries(PatchMemory& memory) noexcept;
 const char* name(Phase phase) noexcept;
 const char* name(Bytes bytes) noexcept;
 
@@ -47,6 +50,7 @@ public:
     virtual void thaw() noexcept = 0;
     virtual bool no_active_calls() noexcept = 0;
     virtual PatchResult patch(bool install) noexcept = 0;
+    virtual PatchResult repair_original_auxiliaries() noexcept = 0;
     virtual void clear_continuation() noexcept = 0;
     virtual bool has_unwind() const noexcept = 0;
     virtual bool has_allocation() const noexcept = 0;
@@ -77,6 +81,7 @@ private:
     bool pinned_ = false;
     bool may_be_live_ = false;
     bool original_verified_ = false;
+    bool auxiliary_pending_ = false;
     bool published_ = false;
     PatchResult last_patch_{};
     const char* reason_ = "empty";

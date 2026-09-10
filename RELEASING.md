@@ -6,7 +6,7 @@ AGENTS.md is authoritative. This is the release snapshot repository, not the dev
 
 License gate: **SATISFIED — MIT License explicitly approved by the user**, included in LICENSE. Each release requires completed review and explicit publication approval. Do not change the license without explicit user approval or insert placeholder license text.
 
-This document describes the workflow; it does not itself authorize publication. The repository is public following approval. The user separately authorized v1.1.0 publication after its release gates pass. Future releases still require their own approval.
+This document describes the workflow; it does not itself authorize publication. The repository is public following approval. The user separately authorized v1.3.0 publication after its release gates pass, accepting the documented startup-smoke limitations. Future releases still require their own approval.
 
 ## Independent versions
 
@@ -16,8 +16,8 @@ Plugin versions and ETS2 versions are independent. Use `vMAJOR.MINOR.PATCH` plug
 | --- | --- |
 | v1.0.0 | ETS2 1.57.2.7: supported / practically tested |
 | v1.1.0 | Retains 1.57.2.7; adds 1.58.1.4: supported / structurally validated |
-| v1.2.0 | Expected first validated ETS2 1.59 support; not implemented or promised |
-| v1.3.0 | Expected first validated ETS2 1.60 support; not implemented or promised |
+| v1.2.0 | Retains earlier builds; adds 1.59.1.3: supported / structurally validated |
+| v1.3.0 | Retains earlier builds; adds 1.60.1.7: structurally validated and live startup smoke passed; gameplay performance not physically validated |
 
 Use a MINOR increment for the first supported executable in a new game-version family. Use PATCH increments for compatibility updates within an already supported family or compatible bug fixes. For example only: v1.1.0 supports the first validated 1.58 executable; v1.1.1 adds or replaces support for another exact 1.58 executable. Do not invent future patch-level ETS2 numbers or assume older executable support is retained. State the complete supported set each time. A MAJOR increment is reserved for deliberately incompatible plugin/configuration changes approved through private development.
 
@@ -31,15 +31,15 @@ Distinguish **SUPPORTED / PRACTICALLY TESTED** (large-map reproduction and recur
 
 ## Asset layout
 
-Current release tag: `v1.1.0`. The published `v1.0.0` tag and assets must remain unchanged.
+Current release tag: `v1.3.0`. All previously published tags and assets must remain unchanged.
 
-Current release title: **ETS2 Cargo Market Fix v1.1.0 — ETS2 1.58.1.4 support**.
+Current release title: **ETS2 Cargo Market Fix v1.3.0 — ETS2 1.60.1.7 support**.
 
-Current package: `ETS2-CargoMarketFix-v1.1.0-ETS2-1.58.1.4.zip`. Its name highlights the new build, but the single DLL supports both exact 1.57.2.7 and 1.58.1.4 executables.
+Current package: `ETS2-CargoMarketFix-v1.3.0-ETS2-1.60.1.7.zip`. Its name highlights the new build, but the single DLL supports exact 1.57.2.7, 1.58.1.4, 1.59.1.3 and 1.60.1.7 executables.
 
 Do not publish broad names such as `latest.zip` or the old family-only package name. For a future multi-executable release within one family, use `ETS2-CargoMarketFix-vX.Y.Z-ETS2-<family>-validated-set.zip` and list every exact supported build prominently in the notes and checksum metadata; never imply arbitrary family-wide support.
 
-ZIP contents are exactly `CargoMarketFix.dll`, `CargoMarketFix.ini`, `README.md` and the approved MIT `LICENSE`. No source, tests, build metadata, logs, debug files, game/SDK data, saves, profiles, mods, research or private paths.
+ZIP contents for v1.3.0 are exactly `CargoMarketFix.dll`, default-disabled `CargoMarketFix.ini`, `config_examples/CargoMarketFix.cap4-spread-active.ini`, `README.md` and the approved MIT `LICENSE`. The extra example is the explicitly approved opt-in path; both behavior patches remain disabled in the default INI. No source, tests, build metadata, logs, debug files, game/SDK data, saves, profiles, mods, research or private paths.
 
 Maintain per-version notes and `SHA256SUMS.txt` under `releases/<tag>/`. The checksum file contains bare filenames for the DLL and ZIP, with no local paths. Plan to upload it as a separate Release asset alongside the ZIP and repeat those two hashes in the release notes. Do not include it inside the minimal ZIP. A bare DLL upload is not required.
 
@@ -59,6 +59,6 @@ Maintain per-version notes and `SHA256SUMS.txt` under `releases/<tag>/`. The che
 
 ## Release records
 
-Historical published notes/checksums remain in [releases/v1.0.0](releases/v1.0.0/RELEASE_NOTES.md). The new compatibility notes/checksums are in [releases/v1.1.0](releases/v1.1.0/RELEASE_NOTES.md). Keep each release immutable in practice: do not overwrite old assets.
+Historical published notes/checksums remain in their version directories. Current compatibility notes/checksums are in [releases/v1.3.0](releases/v1.3.0/RELEASE_NOTES.md). Keep each release immutable in practice: do not overwrite old assets.
 
 Include the approved LICENSE in every package. Any later change to packaged files requires regenerating the ZIP and its checksums/notes and rescanning the final artifacts before approval. These prepared hashes are not valid for a later modified package. Gameplay source is unchanged by this workflow preparation.
