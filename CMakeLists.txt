@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(CargoMarketFix VERSION 1.3.0 LANGUAGES CXX ASM_MASM)
+project(CargoMarketFix VERSION 1.0.1 LANGUAGES CXX ASM_MASM)
 if(NOT WIN32 OR NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
     message(FATAL_ERROR "Windows x64 with MSVC and MASM is required.")
 endif()

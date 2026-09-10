@@ -43,23 +43,40 @@ static bool blocks(cmf::spread::Site& site,void* ip){
     need(SetThreadContext(t,&saved)!=0&&ResumeThread(t)!=DWORD(-1),"resume original thread");
     need(WaitForSingleObject(t,10000)==WAIT_OBJECT_0,"join");CloseHandle(t);return !acquired;
 }
-static void cycle(std::size_t n){
+static void cycle(std::size_t n,unsigned period=60){
     std::vector<Company> companies(n);std::vector<Company*> pointers;for(auto& c:companies)pointers.push_back(&c);
     std::size_t expected_begin=0,small=n,big=0;
-    for(unsigned b=0;b<60;++b){Economy e;e.minute=b;
+    for(unsigned b=0;b<period;++b){Economy e;e.minute=b;
         spread_fixture(pointers.data(),n,&e);
-        const auto size=n/60+(b<n%60),end=expected_begin+size;
+        const auto size=n/period+(b<n%period),end=expected_begin+size;
         for(std::size_t i=0;i<n;++i)need(companies[i].visited==(i<end?1u:0u),"ordered unique contiguous coverage");
         expected_begin=end;small=std::min(small,size);big=std::max(big,size);
     }
     need(expected_begin==n&&big-small<=1,"complete balanced partition");
 }
 int main(int argc,char** argv){try{
-    need(argc==4,"disabled INI, release INI and read-only executable required");
+    need(argc==4,"disabled INI, active INI and read-only executable required");
     const auto defaults=cmf::load_config(argv[1]),active=cmf::load_config(argv[2]);
     check(!defaults.refresh_spread_install&&!defaults.refresh_spread_enabled,"RS01_defaults_disabled");
     check(!active.refresh_spread_refusal()&&!active.cap4_refusal(),"RS02_active_CAP4_and_spread");
-    auto c=active;c.refresh_spread_minutes=59;check(c.refresh_spread_refusal()!=nullptr,"RS03_only_60");
+    auto c=active;c.refresh_spread_minutes=59;check(c.refresh_spread_refusal()!=nullptr,"RS03_invalid_59_refused");
+    check(active.refresh_spread_minutes==180&&!active.refresh_spread_refusal()&&!active.cap4_refusal(),"RS44_active_180_example");
+    {wchar_t dir[MAX_PATH]{},name[MAX_PATH]{};
+        need(GetTempPathW(MAX_PATH,dir)&&GetTempFileNameW(dir,L"cmf",0,name),"config fixture path");
+        struct Temp {const wchar_t* path;~Temp(){DeleteFileW(path);}} temp{name};
+        need(CopyFileW(std::filesystem::path(argv[2]).c_str(),name,FALSE)!=0,"config fixture copy");
+        for(const auto* token:{L"60",L"120",L"180"}){
+            need(WritePrivateProfileStringW(L"CMF_REFRESH_SPREAD",L"refresh_spread_minutes",token,name)!=0,"author valid token");
+            const auto parsed=cmf::load_config(name);
+            need(!parsed.refresh_spread_refusal()&&parsed.refresh_spread_minutes==std::stoul(token),"valid period exact");
+        }
+        check(true,"RS38_exact_60_120_180_config");
+        for(const auto* token:{L"0",L"59",L"61",L"119",L"121",L"179",L"181",L"240",L"-120",L"120x",L"180x",L"0180",L"060",L""}){
+            need(WritePrivateProfileStringW(L"CMF_REFRESH_SPREAD",L"refresh_spread_minutes",token,name)!=0,"author invalid token");
+            const auto bad=cmf::load_config(name);need(!bad.refresh_spread_config_valid&&bad.refresh_spread_refusal(),"invalid period token fail closed");}
+        need(WritePrivateProfileStringW(L"CMF_REFRESH_SPREAD",L"refresh_spread_minutes",nullptr,name)!=0,"missing period");
+        need(cmf::load_config(name).refresh_spread_refusal()!=nullptr,"missing period fail closed");
+        check(true,"RS39_invalid_and_missing_period_tokens_fail_closed");}
     c=active;c.refresh_spread_install=false;check(c.refresh_spread_refusal()!=nullptr,"RS04_both_gates");
     c=active;c.refresh_spread_config_valid=false;check(c.refresh_spread_refusal()!=nullptr,"RS05_invalid_config");
     c=active;c.cap4_enabled=false;check(c.refresh_spread_refusal()!=nullptr,"RS06_CAP4_required");
@@ -73,7 +90,7 @@ int main(int argc,char** argv){try{
     auto* image=static_cast<const std::uint8_t*>(MapViewOfFile(m,FILE_MAP_READ,0,0,0));need(image,"view");
     auto* dos=reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
     auto* nt=reinterpret_cast<const IMAGE_NT_HEADERS64*>(image+dos->e_lfanew);
-    const auto identity=cmf::inspect_executable(argv[3]);
+    const auto identity=cmf::inspect_executable(std::filesystem::path(argv[3]).c_str());
     const auto* build=cmf::fix_builds::identify(identity.sha256);need(identity.sha256_available&&build,"exact build descriptor");
     check(cmf::spread::validate_image(image,nt->OptionalHeader.SizeOfImage,build),"RS10_real_exact_sweep_signature");
     check(cmf::cap4::validate_image(image,nt->OptionalHeader.SizeOfImage,build),"RS11_CAP4_target_unchanged");
@@ -117,6 +134,26 @@ int main(int argc,char** argv){try{
     check(ctl.stop(site)&&std::memcmp(&spread_site,cmf::spread::original.data(),9)==0,"RS30_exact_restore");
     for(auto& x:companies)x=Company{};spread_fixture(ptr.data(),60,&e);all=true;for(auto& x:companies)all&=x.visited==1;
     check(all,"RS31_restored_full_sweep");
+    for(const auto period:{60u,120u,180u}){
+        cmf::spread::Site selected(&spread_site,range(),cmf::spread::legacy_layout,period);cmf::lifecycle::Controller selected_owner;
+        need(selected_owner.install(true,selected)&&cmf_refresh_spread_bucket_count==static_cast<LONG>(period),"configured period published before patch");
+        for(const auto n:{0u,1u,59u,60u,61u,119u,120u,121u,179u,180u,181u,12921u}){
+            cycle(n,period);check(true,("RS40_legacy_"+std::to_string(period)+"_companies_"+std::to_string(n)).c_str());}
+        for(const auto minute:{0u,period-1,period,period+1,1000000u,UINT32_MAX}){
+            for(auto& x:companies)x=Company{};e.minute=minute;spread_fixture(ptr.data(),60,&e);
+            const auto bucket=minute%period,first=bucket*(60/period)+std::min(bucket,60%period),length=60/period+(bucket<60%period);
+            for(unsigned i=0;i<60;++i)need(companies[i].visited==unsigned(i>=first&&i<first+length),"absolute minute exact partition");}
+        check(true,("RS41_legacy_absolute_minutes_"+std::to_string(period)).c_str());
+        need(selected_owner.stop(selected)&&cmf_refresh_spread_active==0,"period owner restore");
+        for(auto& x:companies)x=Company{};spread_fixture(ptr.data(),60,&e);
+        for(const auto& x:companies)need(x.visited==1,"original full traversal after configured restore");
+        check(true,("RS42_period_restore_"+std::to_string(period)).c_str());
+    }
+    {const auto saved=cmf_refresh_spread_bucket_count;
+        for(auto period:{0u,1u,59u,61u,119u,121u,179u,181u,240u,UINT32_MAX}){
+            cmf::spread::Site invalid(&spread_site,range(),cmf::spread::legacy_layout,period);cmf::lifecycle::Controller invalid_owner;
+            need(!invalid_owner.install(true,invalid)&&!invalid_owner.may_be_live()&&cmf_refresh_spread_bucket_count==saved,"invalid native period never published");}
+        check(true,"RS43_invalid_native_period_rejected_before_publish");}
     cmf::spread::Site wrong(&spread_loop,range());cmf::lifecycle::Controller wc;
     check(!wc.install(true,wrong)&&!wc.may_be_live(),"RS32_wrong_prefix_no_patch");
     // An exception in the once/sweep bridge must unwind normally and retain the

@@ -3,7 +3,7 @@
 #include <cstring>
 #include <new>
 
-extern "C" {volatile LONG cmf_refresh_spread_active=0;}
+extern "C" {volatile LONG cmf_refresh_spread_active=0;volatile LONG cmf_refresh_spread_bucket_count=60;}
 namespace cmf {
 namespace spread {
 const Layout* layout_for(Strategy strategy) noexcept {
@@ -78,7 +78,7 @@ bool validate_site_image(const std::uint8_t* base,std::size_t size,std::uint32_t
     }return matches==1;
 }
 bool Site::prepare() noexcept {
-    if(relay_||!valid_layout(layout_)||memory_.classify()!=lifecycle::Bytes::original)return false;
+    if(relay_||(bucket_count_!=60&&bucket_count_!=120&&bucket_count_!=180)||!valid_layout(layout_)||memory_.classify()!=lifecycle::Bytes::original)return false;
     const auto p=reinterpret_cast<std::uintptr_t>(target_);
     if(p>UINTPTR_MAX-(layout_.span-1)||!game_.contains(p)||!game_.contains(p+layout_.span-1))return false;
     // Allocate at allocation-granularity steps, within signed CALL rel32 reach.
@@ -135,10 +135,11 @@ bool RefreshSpread::start(const PluginConfig& config,bool exact_build,Logger& lo
         log.write("Refresh spread refused: exact sweep signature");return false;}
     site_=new(storage_) spread::Site(base+build->spread,
         {reinterpret_cast<std::uintptr_t>(base)+build->sweep_begin,build->sweep_end-build->sweep_begin},
-        *spread::layout_for(build->spread_strategy));
+        *spread::layout_for(build->spread_strategy),config.refresh_spread_minutes);
     if(!controller_.install(true,*site_)){
         log.write(std::string("Refresh spread install failed: ")+controller_.reason());return false;}
-    log.write(std::string("CMF refresh spread ACTIVE; contract=1; minutes=60; partition=contiguous; normal-only; build=")+build->version+
+    log.write(std::string("CMF refresh spread ACTIVE; contract=1; minutes=")+std::to_string(config.refresh_spread_minutes)+
+        "; partition=contiguous; normal-only; build="+build->version+
         "; gate_RVA_decimal="+std::to_string(build->spread)+"; CAP4 retained; no backlog; bulk/activation unchanged");
     return true;
 }

@@ -10,6 +10,9 @@ extern "C" unsigned char cmf_refresh_spread_bridge_end;
 extern "C" void cmf_refresh_spread_bridge_v160();
 extern "C" unsigned char cmf_refresh_spread_bridge_v160_end;
 extern "C" volatile LONG cmf_refresh_spread_active;
+// Published once before installation. Production's single owner is serialized by
+// lifecycle_mutex and must fully stop before reconfiguration; retained on faults.
+extern "C" volatile LONG cmf_refresh_spread_bucket_count;
 
 namespace cmf {
 class Logger;
@@ -47,6 +50,7 @@ class Site final:public lifecycle::Operations {
     std::uint8_t* target_;
     MemoryRange game_;
     const Layout layout_;
+    const std::uint32_t bucket_count_;
     std::array<std::uint8_t,9> detour_{};
     std::uint8_t* relay_=nullptr;
     DWORD protection_=0;
@@ -55,12 +59,12 @@ class Site final:public lifecycle::Operations {
     SuspendedThreads suspended_;
 public:
     const char* freeze_reason=nullptr;
-    Site(std::uint8_t* target,MemoryRange game,Layout layout=legacy_layout) noexcept:
-        target_(target),game_(game),layout_(layout),
+    Site(std::uint8_t* target,MemoryRange game,Layout layout=legacy_layout,std::uint32_t bucket_count=60) noexcept:
+        target_(target),game_(game),layout_(layout),bucket_count_(bucket_count),
         memory_(target,layout_.original.data(),detour_.data(),layout.span<=9?layout.span:0,protection_,pending_){}
     bool prepare() noexcept override;
     bool pin_module() noexcept override{return pin_hook_module();}
-    void publish() noexcept override{}
+    void publish() noexcept override{InterlockedExchange(&cmf_refresh_spread_bucket_count,static_cast<LONG>(bucket_count_));}
     void recording(bool) noexcept override{}
     bool freeze() noexcept override;
     void thaw() noexcept override{suspended_.release();}

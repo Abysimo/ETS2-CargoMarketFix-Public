@@ -41,7 +41,11 @@ PluginConfig load_config(const std::filesystem::path& path) noexcept {
         c.cap4_enabled = boolean(path, L"CMF_CAP4", L"cap4_enabled", valid);
         c.refresh_spread_install = boolean(path, L"CMF_REFRESH_SPREAD", L"refresh_spread_install", valid);
         c.refresh_spread_enabled = boolean(path, L"CMF_REFRESH_SPREAD", L"refresh_spread_enabled", valid);
-        if (read(path, L"CMF_REFRESH_SPREAD", L"refresh_spread_minutes") != L"60") valid = false;
+        const auto period = read(path, L"CMF_REFRESH_SPREAD", L"refresh_spread_minutes");
+        if (period == L"60") c.refresh_spread_minutes = 60;
+        else if (period == L"120") c.refresh_spread_minutes = 120;
+        else if (period == L"180") c.refresh_spread_minutes = 180;
+        else valid = false;
         // These safety gates are fixed in this release; old overrides fail closed.
         bool safety_valid = true;
         c.target_this_build_only = boolean(path, L"Build", L"target_this_build_only", safety_valid, false);

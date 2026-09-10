@@ -1,5 +1,6 @@
 OPTION CASEMAP:NONE
 EXTERN cmf_refresh_spread_active:DWORD
+EXTERN cmf_refresh_spread_bucket_count:DWORD
 PUBLIC cmf_refresh_spread_bridge_v160
 PUBLIC cmf_refresh_spread_bridge_v160_end
 .code
@@ -38,7 +39,7 @@ cmf_refresh_spread_bridge_v160 PROC FRAME
     jne v160_done
     mov eax,DWORD PTR [rbp+19Ch]
     xor edx,edx
-    mov r8d,60
+    mov r8d,DWORD PTR [cmf_refresh_spread_bucket_count] ; immutable installed startup period
     div r8
     mov r9,rdx
     mov rax,[rsp+38h]

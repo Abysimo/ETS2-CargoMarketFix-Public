@@ -54,10 +54,11 @@ int main(){try{
         image[build->spread+3]^=1;
         check(!spread::validate_image(image,size,build),tag+"spread_changed_byte_rejected");image[build->spread+3]^=1;
         cap4::Site cap(image+build->cap4,{reinterpret_cast<std::uintptr_t>(image)+build->generator_begin,build->generator_end-build->generator_begin},build->cap4_original,build->cap4_write_strategy);
-        spread::Site sweep(image+build->spread,{reinterpret_cast<std::uintptr_t>(image)+build->sweep_begin,build->sweep_end-build->sweep_begin},layout);
+        spread::Site sweep(image+build->spread,{reinterpret_cast<std::uintptr_t>(image)+build->sweep_begin,build->sweep_end-build->sweep_begin},layout,180);
         lifecycle::Controller c,p;
         check(c.install(true,cap)&&image[build->cap4]==0x90&&image[build->cap4+1]==0x90,tag+"CAP4_install");
         check(p.install(true,sweep)&&image[build->spread]==0xe8&&image[build->spread+5]==0xe3&&image[build->spread+6]==layout.empty_displacement,tag+"spread_install_original_branches");
+        check(cmf_refresh_spread_bucket_count==180,tag+"configured_180_published");
         check(p.stop(sweep)&&std::memcmp(image+build->spread,layout.original.data(),layout.span)==0,tag+"spread_restore");
         check(c.stop(cap)&&image[build->cap4]==0x73&&image[build->cap4+1]==(build->cap4_original>>8),tag+"CAP4_restore");
         check(cap4::validate_image(image,size,build)&&spread::validate_image(image,size,build),tag+"restored_identity");

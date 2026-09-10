@@ -39,11 +39,11 @@ static bool blocks(spread::Site& site,std::uintptr_t ip){
     auto now=old;now.Rip=ip;need(SetThreadContext(h,&now)!=0,"IP");bool acquired=site.freeze();if(acquired)site.thaw();
     need(SetThreadContext(h,&old)!=0&&ResumeThread(h)!=DWORD(-1),"resume");need(WaitForSingleObject(h,10000)==WAIT_OBJECT_0,"join");CloseHandle(h);return !acquired;
 }
-static void cycle(std::size_t n,void(*sweep)(Company**,std::uint64_t,Economy*)=s160_fixture){
+static void cycle(std::size_t n,void(*sweep)(Company**,std::uint64_t,Economy*)=s160_fixture,unsigned period=60){
     std::vector<Company> c(n);std::vector<Company*> p;for(auto& x:c)p.push_back(&x);
     std::size_t end=0,small=n,big=0;
-    for(unsigned m=0;m<60;++m){Economy e;e.minute=m;std::memcpy(e.pad+0x15c,&m,4);auto before=visits;sweep(p.data(),n,&e);
-        auto length=n/60+(m<n%60);need(visits-before==length,"bucket length");end+=length;
+    for(unsigned m=0;m<period;++m){Economy e;e.minute=m;std::memcpy(e.pad+0x15c,&m,4);auto before=visits;sweep(p.data(),n,&e);
+        auto length=n/period+(m<n%period);need(visits-before==length,"bucket length");end+=length;
         for(std::size_t i=0;i<n;++i)need(c[i].visits==(i<end?1u:0u),"exact contiguous once coverage");
         small=std::min(small,length);big=std::max(big,length);
     }need(end==n&&big-small<=1,"balanced complete");
@@ -117,6 +117,13 @@ int main(){std::setvbuf(stdout,nullptr,_IONBF,0);try{
     mode=2;auto handler=AddVectoredExceptionHandler(1,search);need(handler!=nullptr,"VEH");auto v=visits;s160_fixture(p.data(),60,&e);RemoveVectoredExceptionHandler(handler);mode=0;
     check(searches==1&&visits==v+1&&cmf_refresh_spread_active==0,"continue_execution_once");
     check(owner.stop(site)&&!site.has_allocation()&&!std::memcmp(&s160_site-1,before,sizeof(before)),"exact_eight_restore_relay_release");
+    for(auto period:{60u,120u,180u}){
+        spread::Site configured(&s160_site,range(),spread::v160_layout,period);lifecycle::Controller configured_owner;
+        need(configured_owner.install(true,configured)&&cmf_refresh_spread_bucket_count==static_cast<LONG>(period),"v160 startup period published");
+        for(auto n:{0u,1u,59u,60u,61u,119u,120u,121u,179u,180u,181u,12921u})cycle(n,s160_fixture,period);
+        check(true,period==60?"configured_60_full_matrix":period==120?"configured_120_full_matrix":"configured_180_full_matrix");
+        need(configured_owner.stop(configured)&&!configured.has_allocation(),"v160 configured restore");
+    }
     for(unsigned i=0;i<100;++i){spread::Site s(&s160_site,range(),spread::v160_layout);lifecycle::Controller o;need(o.install(true,s),"repeat install");
         auto first=*(&s160_site-1),next=*(&s160_site+8);s160_fixture(p.data(),60,&e);need(first==before[0]&&next==before[9]&&o.stop(s)&&!s.has_allocation()&&!std::memcmp(&s160_site-1,before,12),"repeat boundary restore");}
     check(true,"100_native_boundary_cycles");

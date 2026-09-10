@@ -41,7 +41,7 @@ struct PluginConfig final {
     }
     [[nodiscard]] const char* refresh_spread_refusal() const noexcept {
         if (!refresh_spread_install || !refresh_spread_enabled) return "both_spread_gates_required";
-        if (!refresh_spread_config_valid || refresh_spread_minutes != 60) return "only_60_minutes_supported";
+        if (!refresh_spread_config_valid || (refresh_spread_minutes != 60 && refresh_spread_minutes != 120 && refresh_spread_minutes != 180)) return "only_60_120_or_180_minutes_supported";
         if (cap4_refusal()) return "requires_active_CAP4_and_all_observers_disabled";
         return nullptr;
     }

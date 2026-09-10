@@ -18,9 +18,9 @@ int main(int argc, char** argv) {
     try {
         if (argc != 5) return 2;
         auto c = cmf::load_config(argv[1]);
-        check(std::strcmp(cmf::kPluginVersion, "1.3.0") == 0, "R01_release_version");
+        check(std::strcmp(cmf::kPluginVersion, "1.0.1") == 0, "R01_release_version");
         check(c.enabled && !c.cap4_install && !c.cap4_enabled, "R02_release_CAP4_off");
-        check(!c.refresh_spread_install && !c.refresh_spread_enabled && c.refresh_spread_minutes == 60,
+        check(!c.refresh_spread_install && !c.refresh_spread_enabled && c.refresh_spread_minutes == 180,
               "R03_release_spread_off");
         check(!c.hooking_enabled && !c.membership_shadow_install && !c.membership_shadow_enabled &&
               !c.install_cmf_internal_compatibility && !c.cmf_internal_compatibility_enabled,
@@ -28,6 +28,9 @@ int main(int argc, char** argv) {
         check(c.target_this_build_only && !c.allow_unknown_build && c.fail_closed, "R05_fixed_build_gates");
         const auto game = cmf::inspect_executable(argv[2]);
         check(game.sha256_available && cmf::fix_builds::identify(game.sha256), "R06_exact_game_hash_readonly");
+        const auto* release_target = cmf::fix_builds::identify(cmf::kExpectedExecutableSha256);
+        check(release_target && std::strcmp(release_target->version,cmf::kTargetEts2Version)==0,
+              "R18_release_target_exact_descriptor");
         const auto self = cmf::inspect_executable(cmf::process_executable_path());
         check(self.sha256_available && !cmf::fix_builds::identify(self.sha256), "R07_unsupported_host_hash");
         cmf::Logger log; cmf::Cap4Patch cap4; cmf::RefreshSpread spread;
@@ -35,7 +38,7 @@ int main(int argc, char** argv) {
               !cmf::hook_module_was_pinned(),"R16_defaults_no_patch_PIN");
         c=cmf::load_config(argv[4]);
         check(c.cap4_install&&c.cap4_enabled&&!c.cap4_refusal()&&c.refresh_spread_install&&
-              c.refresh_spread_enabled&&c.refresh_spread_minutes==60&&!c.refresh_spread_refusal(),
+              c.refresh_spread_enabled&&c.refresh_spread_minutes==180&&!c.refresh_spread_refusal(),
               "R17_active_example_both_patches_no_observers");
         check(!cap4.start(c, false, log) && !spread.start(c, false, log) &&
               !cap4.potentially_live() && !cmf::hook_module_was_pinned(), "R08_unknown_build_no_patch_PIN");

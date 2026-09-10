@@ -1,5 +1,6 @@
 OPTION CASEMAP:NONE
 EXTERN cmf_refresh_spread_active:DWORD
+EXTERN cmf_refresh_spread_bucket_count:DWORD
 PUBLIC cmf_refresh_spread_bridge
 PUBLIC cmf_refresh_spread_bridge_end
 .code
@@ -43,12 +44,12 @@ cmf_refresh_spread_bridge PROC FRAME
     ; never unsafe restoration/free, never swallowed or retried.
     mov eax,DWORD PTR [rsi+15Ch]
     xor edx,edx
-    mov r8d,60
+    mov r8d,DWORD PTR [cmf_refresh_spread_bucket_count] ; immutable installed startup period
     div r8
     mov r9,rdx                 ; bucket
     mov rax,[rsp]              ; N
     xor edx,edx
-    div r8                     ; q=N/60, remainder r
+    div r8                     ; q=N/bucket_count, remainder r
     mov r10,rax                ; length=q+(bucket<r)
     imul rax,r9                ; start=bucket*q+min(bucket,r), <=N
     mov r11,rdx

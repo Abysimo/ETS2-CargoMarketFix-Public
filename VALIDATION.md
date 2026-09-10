@@ -1,5 +1,9 @@
 # Release snapshot validation
 
+## v1.0.1 — ETS2 1.57.2.7 180-minute maintenance
+
+Focused 148/148; one Release maintenance run 313/313, seven suites, 267.68 seconds, no retries. Default patches OFF; active example 180. CAP4/sites/lifecycle unchanged. Exports, package entries, byte identities, default parity and public-safe DLL content verified. The installed exact 1.57.2.7 executable was SHA256-checked and mapped read-only for signature validation. See [release notes](releases/v1.0.1/RELEASE_NOTES.md) for exact hashes and qualification.
+
 ## v1.3.0 compatibility release
 
 Promoted the already validated private 1.60 patch backends without functional edits: exact descriptors, CAP4 quiesced-copy backend, auxiliary-repair lifecycle safety, Refresh Spread owner and dedicated 1.60 MASM bridge match the validated private source (apart from line endings). The public minimal wrapper/parser remains separate, and no historical observer or membership code is imported. Public version metadata is 1.3.0.
