@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     try {
         if (argc != 5) return 2;
         auto c = cmf::load_config(argv[1]);
-        check(std::strcmp(cmf::kPluginVersion, "1.0.1") == 0, "R01_release_version");
+        check(std::strcmp(cmf::kPluginVersion, "1.1.1") == 0, "R01_release_version");
         check(c.enabled && !c.cap4_install && !c.cap4_enabled, "R02_release_CAP4_off");
         check(!c.refresh_spread_install && !c.refresh_spread_enabled && c.refresh_spread_minutes == 180,
               "R03_release_spread_off");

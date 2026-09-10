@@ -1,11 +1,11 @@
-# ETS2 Cargo Market Fix v1.0.1 — ETS2 1.57.2.7
+# ETS2 Cargo Market Fix v1.1.1 — ETS2 1.58.1.4
 
-This release package is specifically for **ETS2 1.57.2.7, Windows x64**.
-Download **ETS2-CargoMarketFix-v1.0.1-ETS2-1.57.2.7.zip** from the [matching release](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.0.1).
+This release package is specifically for **ETS2 1.58.1.4, Windows x64**.
+Download **ETS2-CargoMarketFix-v1.1.1-ETS2-1.58.1.4.zip** from the [matching release](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.1.1).
 
-**SUPPORTED / PRACTICALLY TESTED.**
+**SUPPORTED / STRUCTURALLY VALIDATED.**
 
-On the original very-large-map owned-trailer test setup, the 180-minute refresh spread reduced the recurring Cargo Market freezes to a very small residual stutter. The user accepts this result. This is not complete elimination or a universal guarantee. The public packaging binary is validated offline; the gameplay feedback used the corresponding private implementation.
+180-minute gameplay performance has not been physically validated on this version. Exact descriptors and previously validated patch sites are retained, with native coverage and release maintenance checks. No freeze-reduction or gameplay-quality claim is made for this version.
 
 ## What it changes
 
@@ -18,7 +18,7 @@ CAP4 remains fixed at **four current-trailer Cargo Market generation attempts**.
 | Exact ETS2 build | Release line / current package | Qualification |
 | --- | --- | --- |
 | 1.57.2.7 | v1.0.1 | Practically tested reference |
-| 1.58.1.4 | v1.1.0 | Structurally validated |
+| 1.58.1.4 | v1.1.1 | Structurally validated |
 | 1.59.1.3 | v1.2.0 | Structurally validated |
 | 1.60.1.7 | v1.3.0 | Structurally validated; prior startup smoke |
 

@@ -7,10 +7,10 @@
 namespace cmf {
 
 inline constexpr char kPluginVersion[] =
-    "1.0.1";
-inline constexpr char kTargetEts2Version[] = "1.57.2.7";
+    "1.1.1";
+inline constexpr char kTargetEts2Version[] = "1.58.1.4";
 inline constexpr char kExpectedExecutableSha256[] =
-    "06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9";
+    "25CD132FB72576242C298E5EC5B6D940F2E38EBB183928AC1F16D075256BC644";
 
 struct ExecutableIdentity final {
     std::filesystem::path path;
