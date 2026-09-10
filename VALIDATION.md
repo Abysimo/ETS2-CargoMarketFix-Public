@@ -1,5 +1,9 @@
 # Release snapshot validation
 
+## v1.3.1 — ETS2 1.60.1.7 180-minute maintenance
+
+Focused 214/214; one Release maintenance run 313/313, seven suites, 255.57 seconds, no retries. Default patches OFF; active example 180. CAP4/sites/lifecycle unchanged. Exports, package entries, byte identities, default parity and public-safe DLL content verified. The exact target hash/sites/ABI are retained from the previously certified private port; that historical executable was not freshly reread in this rollout. Fresh target-specific authored image tests exercise its exact descriptor, signature isolation, 180 publication, install/restore and fail-closed handling. Native bridge fixtures execute the corresponding validated ABI. The currently installed 1.57 image is also checked read-only by the common maintenance suite; that read is not presented as a fresh 1.60.1.7 executable validation. See [release notes](releases/v1.3.1/RELEASE_NOTES.md) for exact hashes and qualification.
+
 ## v1.2.1 — ETS2 1.59.1.3 180-minute maintenance
 
 Focused 148/148; one Release maintenance run 313/313, seven suites, 259.65 seconds, no retries. Default patches OFF; active example 180. CAP4/sites/lifecycle unchanged. Exports, package entries, byte identities, default parity and public-safe DLL content verified. The exact target hash/sites/ABI are retained from the previously certified private port; that historical executable was not freshly reread in this rollout. Fresh target-specific authored image tests exercise its exact descriptor, signature isolation, 180 publication, install/restore and fail-closed handling. Native bridge fixtures execute the corresponding validated ABI. The currently installed 1.57 image is also checked read-only by the common maintenance suite; that read is not presented as a fresh 1.59.1.3 executable validation. See [release notes](releases/v1.2.1/RELEASE_NOTES.md) for exact hashes and qualification.

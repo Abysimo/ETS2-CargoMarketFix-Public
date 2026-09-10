@@ -1,11 +1,11 @@
-# ETS2 Cargo Market Fix v1.2.1 — ETS2 1.59.1.3
+# ETS2 Cargo Market Fix v1.3.1 — ETS2 1.60.1.7
 
-This release package is specifically for **ETS2 1.59.1.3, Windows x64**.
-Download **ETS2-CargoMarketFix-v1.2.1-ETS2-1.59.1.3.zip** from the [matching release](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.2.1).
+This release package is specifically for **ETS2 1.60.1.7, Windows x64**.
+Download **ETS2-CargoMarketFix-v1.3.1-ETS2-1.60.1.7.zip** from the [matching release](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.3.1).
 
 **SUPPORTED / STRUCTURALLY VALIDATED.**
 
-180-minute gameplay performance has not been physically validated on this version. Exact descriptors and previously validated patch sites are retained, with native coverage and release maintenance checks. No freeze-reduction or gameplay-quality claim is made for this version.
+PRIOR LIVE STARTUP SMOKE PASSED. 180-MINUTE GAMEPLAY PERFORMANCE NOT PHYSICALLY VALIDATED. The prior private 60-minute build installed CAP4 and the dedicated Refresh Spread bridge and remained responsive at the menu for 131 seconds. That is historical patch-site compatibility evidence, not a live test of this 180-minute public binary. Clean live shutdown/restoration was not confirmed. Owned-trailer performance, sleep/bulk gameplay and offer quality were not physically validated on this version.
 
 ## What it changes
 
@@ -20,7 +20,7 @@ CAP4 remains fixed at **four current-trailer Cargo Market generation attempts**.
 | 1.57.2.7 | v1.0.1 | Practically tested reference |
 | 1.58.1.4 | v1.1.1 | Structurally validated |
 | 1.59.1.3 | v1.2.1 | Structurally validated |
-| 1.60.1.7 | v1.3.0 | Structurally validated; prior startup smoke |
+| 1.60.1.7 | v1.3.1 | Structurally validated; prior startup smoke |
 
 Each game version has its own release line and package. Do not substitute a different game's package. Older releases retain their original settings and documentation and remain unchanged. Internally this shared source recognizes the four certified exact hashes below; that does not change this package's single-game release scope.
 
