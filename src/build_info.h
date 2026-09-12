@@ -3,14 +3,20 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include "fix_builds.h"
 
 namespace cmf {
 
-inline constexpr char kPluginVersion[] =
-    "1.3.1";
+#ifdef CMF_RELEASE_VERSION
+inline constexpr char kPluginVersion[] = CMF_RELEASE_VERSION;
+inline constexpr const char* kTargetEts2Version = fix_builds::supported[0]->version;
+inline constexpr const char* kExpectedExecutableSha256 = fix_builds::supported[0]->sha256;
+#else
+inline constexpr char kPluginVersion[] = "1.4.0";
 inline constexpr char kTargetEts2Version[] = "1.60.1.7";
 inline constexpr char kExpectedExecutableSha256[] =
     "B7DFFE6B27402C7DB6DFD52CF982CD5BF292584138B35E3EB8EFB311814AB3F8";
+#endif
 
 struct ExecutableIdentity final {
     std::filesystem::path path;

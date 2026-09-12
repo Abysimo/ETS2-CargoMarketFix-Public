@@ -60,18 +60,18 @@ int main(int argc,char** argv){try{
     check(!defaults.refresh_spread_install&&!defaults.refresh_spread_enabled,"RS01_defaults_disabled");
     check(!active.refresh_spread_refusal()&&!active.cap4_refusal(),"RS02_active_CAP4_and_spread");
     auto c=active;c.refresh_spread_minutes=59;check(c.refresh_spread_refusal()!=nullptr,"RS03_invalid_59_refused");
-    check(active.refresh_spread_minutes==180&&!active.refresh_spread_refusal()&&!active.cap4_refusal(),"RS44_active_180_example");
+    check(active.refresh_spread_minutes==1440&&!active.refresh_spread_refusal()&&!active.cap4_refusal(),"RS44_active_1440_example");
     {wchar_t dir[MAX_PATH]{},name[MAX_PATH]{};
         need(GetTempPathW(MAX_PATH,dir)&&GetTempFileNameW(dir,L"cmf",0,name),"config fixture path");
         struct Temp {const wchar_t* path;~Temp(){DeleteFileW(path);}} temp{name};
         need(CopyFileW(std::filesystem::path(argv[2]).c_str(),name,FALSE)!=0,"config fixture copy");
-        for(const auto* token:{L"60",L"120",L"180"}){
+        for(const auto* token:{L"60",L"120",L"180",L"1440"}){
             need(WritePrivateProfileStringW(L"CMF_REFRESH_SPREAD",L"refresh_spread_minutes",token,name)!=0,"author valid token");
             const auto parsed=cmf::load_config(name);
             need(!parsed.refresh_spread_refusal()&&parsed.refresh_spread_minutes==std::stoul(token),"valid period exact");
         }
-        check(true,"RS38_exact_60_120_180_config");
-        for(const auto* token:{L"0",L"59",L"61",L"119",L"121",L"179",L"181",L"240",L"-120",L"120x",L"180x",L"0180",L"060",L""}){
+        check(true,"RS38_exact_60_120_180_1440_config");
+        for(const auto* token:{L"0",L"59",L"61",L"119",L"121",L"179",L"181",L"240",L"1439",L"1441",L"01440",L"1440x",L"-120",L"120x",L"180x",L"0180",L"060",L""}){
             need(WritePrivateProfileStringW(L"CMF_REFRESH_SPREAD",L"refresh_spread_minutes",token,name)!=0,"author invalid token");
             const auto bad=cmf::load_config(name);need(!bad.refresh_spread_config_valid&&bad.refresh_spread_refusal(),"invalid period token fail closed");}
         need(WritePrivateProfileStringW(L"CMF_REFRESH_SPREAD",L"refresh_spread_minutes",nullptr,name)!=0,"missing period");
@@ -134,10 +134,10 @@ int main(int argc,char** argv){try{
     check(ctl.stop(site)&&std::memcmp(&spread_site,cmf::spread::original.data(),9)==0,"RS30_exact_restore");
     for(auto& x:companies)x=Company{};spread_fixture(ptr.data(),60,&e);all=true;for(auto& x:companies)all&=x.visited==1;
     check(all,"RS31_restored_full_sweep");
-    for(const auto period:{60u,120u,180u}){
+    for(const auto period:{60u,120u,180u,1440u}){
         cmf::spread::Site selected(&spread_site,range(),cmf::spread::legacy_layout,period);cmf::lifecycle::Controller selected_owner;
         need(selected_owner.install(true,selected)&&cmf_refresh_spread_bucket_count==static_cast<LONG>(period),"configured period published before patch");
-        for(const auto n:{0u,1u,59u,60u,61u,119u,120u,121u,179u,180u,181u,12921u}){
+        for(const auto n:{0u,1u,59u,60u,61u,119u,120u,121u,179u,180u,181u,1439u,1440u,1441u,12921u}){
             cycle(n,period);check(true,("RS40_legacy_"+std::to_string(period)+"_companies_"+std::to_string(n)).c_str());}
         for(const auto minute:{0u,period-1,period,period+1,1000000u,UINT32_MAX}){
             for(auto& x:companies)x=Company{};e.minute=minute;spread_fixture(ptr.data(),60,&e);

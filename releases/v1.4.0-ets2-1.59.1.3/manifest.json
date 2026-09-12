@@ -1,0 +1,17 @@
+{
+  "target": "1.59.1.3",
+  "tag": "v1.4.0-ets2-1.59.1.3",
+  "executable_sha256": "E6FE1A58DF9D0BFFF21DCCC12B4F581DC0D3E3B5885DBF62ED05028DE794D35C",
+  "url": "https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.59.1.3",
+  "dll_version": "1.4.0-ets2-1.59.1.3",
+  "dll_bytes": 324096,
+  "dll_sha256": "AF28F056DBF3ADF9816281F5856D09BC8BED7C21776D4ABA07630338B2CFDEBD",
+  "zip_name": "ETS2-CargoMarketFix-v1.4.0-ETS2-1.59.1.3.zip",
+  "zip_bytes": 163850,
+  "zip_sha256": "8B043590352C6C518D2287C004E4A8C6FB3315C06CA59B6C4451B0FC473B1105",
+  "exports": [
+    "scs_telemetry_init",
+    "scs_telemetry_shutdown"
+  ],
+  "qualification": "STRUCTURALLY VALIDATED. No physical Spread1440 gameplay test is claimed for this target. No measured freeze reduction, owned-trailer, sleep/bulk gameplay, or offer-quality validation is claimed."
+}

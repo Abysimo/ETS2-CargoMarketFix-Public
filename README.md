@@ -1,61 +1,79 @@
-# ETS2 Cargo Market Fix v1.3.1 — ETS2 1.60.1.7
+# ETS2 Cargo Market Fix v1.4.0
 
-This release package is specifically for **ETS2 1.60.1.7, Windows x64**.
-Download **ETS2-CargoMarketFix-v1.3.1-ETS2-1.60.1.7.zip** from the [matching release](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.3.1).
+**Choose the release matching your EXACT ETS2 version. Each DLL accepts only that
+release's executable hash. Do not mix DLLs between game versions.**
 
-**SUPPORTED / STRUCTURALLY VALIDATED.**
-
-PRIOR LIVE STARTUP SMOKE PASSED. 180-MINUTE GAMEPLAY PERFORMANCE NOT PHYSICALLY VALIDATED. The prior private 60-minute build installed CAP4 and the dedicated Refresh Spread bridge and remained responsive at the menu for 131 seconds. That is historical patch-site compatibility evidence, not a live test of this 180-minute public binary. Clean live shutdown/restoration was not confirmed. Owned-trailer performance, sleep/bulk gameplay and offer quality were not physically validated on this version.
-
-## What it changes
-
-CAP4 remains fixed at **four current-trailer Cargo Market generation attempts**. Refresh Spread supports exactly **60 / 120 / 180 in-game minutes**. The recommended active setting is now **180**: normal company refresh work is distributed in contiguous balanced partitions across **three in-game hours**, without a retained backlog.
-
-**Both behavior patches remain opt-in and disabled by default.** All observers, including membership shadow, are absent from the public DLL. Unknown executable builds fail closed; exact hashes and signatures are required.
-
-## Choose the release for your game
-
-| Exact ETS2 build | Release line / current package | Qualification |
+| Exact ETS2 version | Download release | Spread1440 validation |
 | --- | --- | --- |
-| 1.57.2.7 | v1.0.1 | Practically tested reference |
-| 1.58.1.4 | v1.1.1 | Structurally validated |
-| 1.59.1.3 | v1.2.1 | Structurally validated |
-| 1.60.1.7 | v1.3.1 | Structurally validated; prior startup smoke |
+| 1.57.2.7 | [v1.4.0-ets2-1.57.2.7](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.57.2.7) | Physically gameplay tested; see qualification below |
+| 1.58.1.4 | [v1.4.0-ets2-1.58.1.4](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.58.1.4) | Structurally validated |
+| 1.59.1.3 | [v1.4.0-ets2-1.59.1.3](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.59.1.3) | Structurally validated |
+| 1.60.1.7 | [v1.4.0-ets2-1.60.1.7](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.60.1.7) | Structurally validated; earlier-settings startup smoke only |
 
-Each game version has its own release line and package. Do not substitute a different game's package. Older releases retain their original settings and documentation and remain unchanged. Internally this shared source recognizes the four certified exact hashes below; that does not change this package's single-game release scope.
+Each release has one ZIP, one matching DLL, and SHA256SUMS.txt. Exact executable
+hashes and artifact checksums are in its notes. Other known versions and unknown
+builds fail closed. Older releases remain available with their original settings.
 
-- 1.57.2.7: `06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9`
-- 1.58.1.4: `25CD132FB72576242C298E5EC5B6D940F2E38EBB183928AC1F16D075256BC644`
-- 1.59.1.3: `E6FE1A58DF9D0BFFF21DCCC12B4F581DC0D3E3B5885DBF62ED05028DE794D35C`
-- 1.60.1.7: `B7DFFE6B27402C7DB6DFD52CF982CD5BF292584138B35E3EB8EFB311814AB3F8`
+## Install — both patches are ACTIVE in v1.4.0 packages
 
-## Installation and explicit opt-in
+1. Close ETS2. Back up any existing CargoMarketFix DLL and INI.
+2. Download the ZIP for your exact game version from the table.
+3. Copy **both CargoMarketFix.dll and CargoMarketFix.ini** into:
+   `Euro Truck Simulator 2/bin/win_x64/plugins/`
+4. Launch normally. The supplied INI enables **CAP4=4 + Refresh Spread=1440**.
+   The local CargoMarketFix.log reports exact-build acceptance and active settings.
 
-1. Close ETS2 and back up the existing plugin DLL, INI and log.
-2. Extract this game's package.
-3. Copy `CargoMarketFix.dll` and `CargoMarketFix.ini` to `Euro Truck Simulator 2/bin/win_x64/plugins/` (create that directory if necessary).
-4. The supplied default INI enables **neither patch**, although its preferred period is 180.
-5. To opt in, copy `config_examples/CargoMarketFix.cap4-spread-active.ini` from this ZIP to the plugins directory **as `CargoMarketFix.ini`**. It enables CAP4 plus 180-minute Spread with observers off.
-6. Launch normally and inspect `CargoMarketFix.log` for exact-build acceptance, CAP4 budget 4 and Spread `minutes=180`.
+This is a native Windows x64 plugin, **not an .scs mod**. It does not use Mod Manager.
+Do not reuse a diagnostic/research INI. No observers or diagnostics are compiled
+into these DLLs; no collector is needed.
 
-This is not an `.scs` mod and does not use Mod Manager. Close the game before changing configuration. Only 60, 120 and 180 are accepted; malformed, missing or unsupported values fail closed. Do not disable safety gates.
+To disable both patches, close the game and replace CargoMarketFix.ini with
+`config_examples/CargoMarketFix.disabled.ini` (renamed CargoMarketFix.ini), or
+remove the DLL while the game is closed. The executable on disk is never patched.
 
-## Tradeoffs and limits
+## What changed
 
-Normal company offer refresh can be delayed by up to approximately **179 in-game minutes** at 180 (119 at 120; 59 at 60). Offers may be fewer or less fresh. Each company is covered once per complete cycle when the company list remains fixed and every normal minute is processed; time jumps or changing lists are not a persistence/snapshot guarantee.
+CAP4 keeps the fixed four-attempt current-trailer Cargo Market generation limit.
+The recommended active Refresh Spread changes from 180 to **1440 game minutes
+(24 game hours)**. It distributes the normal company sweep into balanced contiguous
+slices without a backlog or adaptive scheduler. Accepted settings are exactly
+60, 120, 180 and 1440; unsupported/malformed settings fail closed, not clamped.
 
-Bulk/sleep refresh and trailer activation are **not intentionally spread by this scheduler**; their established CAP4 behavior is unchanged. Initial activation may still take time. No claim of absolute freeze elimination is made.
+180-minute spreading could still cluster many expensive regenerations in one
+game-minute update. 1440 lowers the maximum company entries per normal slice.
+This is not proof that time of day causes the issue and not a GPU/FPS optimization.
 
-## Updating, removal and troubleshooting
+## Validation and limits
 
-Replace both files using your exact game's release. Keep backups; do not reuse research INIs. To disable or remove, close ETS2, switch both install/enabled gates off or remove the DLL/INI. The executable on disk is not edited. Removal does not undo offers already saved by the game.
+**1.57.2.7 — PHYSICALLY GAMEPLAY TESTED:** the user tested the equivalent private
+Spread1440 implementation with CAP4=4 on a heavy real map combo, an owned trailer,
+and daytime driving where strong recurring freezes were previously visible.
+No recurring freezes were observed during that test; gameplay felt smooth.
+The newly packaged public DLL has offline validation. This is not a universal
+guarantee or a measured FPS improvement.
 
-An unknown build receives no patches. After a game update, check compatibility again. A version-change notice can delay plugin initialization/log creation. For problems, inspect the log and report your exact game build and map setup, redacting personal information; do not upload saves or private traces.
+**1.58.1.4 / 1.59.1.3 / 1.60.1.7 — STRUCTURALLY VALIDATED:** no physical
+Spread1440 gameplay-performance claim. The historical 1.60 startup smoke used
+earlier settings, not Spread1440. Clean live shutdown was not confirmed in that
+smoke. No new owned-trailer, sleep/bulk or offer-quality gameplay test is claimed.
 
-## Privacy, build and license
+A company may wait up to roughly **24 in-game hours** for its normal
+spread-controlled refresh. Fewer or less-fresh offers may temporarily occur.
+Complete-cycle coverage assumes a fixed list and all normal minutes being processed;
+time jumps or changing lists are not a snapshot guarantee.
+Sleep/bulk and activation/direct generation remain separate and unchanged.
+Initial activation can still take time. No save format, serialization or persistent
+cache is added, but changing refresh times can change offers subsequently saved.
+Removing the plugin does not retroactively undo those offers.
 
-No network access or uploaded telemetry. Output is a local plugin log. No historical/research observers are compiled.
+## Build, privacy and license
 
-Build with CMake 3.25+, Windows x64 MSVC/MASM and a locally obtained SCS Telemetry SDK: configure `-S . -B build -A x64 -DSCS_SDK_INCLUDE_DIR="<local include directory>"`, then build Release. SDK/game files are not bundled. Offline tests additionally use `-DCMF_BUILD_TESTS=ON` and `-DCMF_GAME_EXE="<read-only supported executable>"`; run CTest in Release. Native tests execute authored fixtures, never ETS2. See [VALIDATION.md](VALIDATION.md) and the per-release notes for evidence limits.
+No network access or uploaded telemetry; only a local health log.
+See [VALIDATION.md](VALIDATION.md) and [RELEASING.md](RELEASING.md).
+Build requires Windows x64 MSVC/MASM, CMake 3.25+, and a locally obtained SCS SDK.
+Set `CMF_ETS2_TARGET` to exactly one version from the table and
+`SCS_SDK_INCLUDE_DIR` to your local SDK include directory, then build Release.
+An unspecified/unsupported release target is a configuration error.
+SDK/game files and diagnostic tools are not included.
 
 MIT License; see [LICENSE](LICENSE).

@@ -45,6 +45,7 @@ PluginConfig load_config(const std::filesystem::path& path) noexcept {
         if (period == L"60") c.refresh_spread_minutes = 60;
         else if (period == L"120") c.refresh_spread_minutes = 120;
         else if (period == L"180") c.refresh_spread_minutes = 180;
+        else if (period == L"1440") c.refresh_spread_minutes = 1440;
         else valid = false;
         // These safety gates are fixed in this release; old overrides fail closed.
         bool safety_valid = true;

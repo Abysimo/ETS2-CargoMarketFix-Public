@@ -1,40 +1,57 @@
-# Version-specific release workflow
+# v1.4.0 exact-target release workflow
 
-This public repository receives sanitized, user-approved snapshots from the private development repository. AGENTS.md remains authoritative. MIT licensing is approved; publication still requires explicit user authorization.
+This is a sanitized release snapshot. Development and validation originate in the
+private repository; AGENTS.md remains authoritative. Publication needs explicit
+user approval. The approved v1.4.0 family supersedes the old per-game minor-number
+convention without rewriting any older release.
 
-## Per-game release lines
+## Build profiles
 
-| Exact ETS2 | Plugin release line |
-| --- | --- |
-| 1.57.2.7 | v1.0.x |
-| 1.58.1.4 | v1.1.x |
-| 1.59.1.3 | v1.2.x |
-| 1.60.1.7 | v1.3.x |
+Product version 1.4.0; tags are `v1.4.0-ets2-<exact version>`.
+Supported profile values: 1.57.2.7, 1.58.1.4, 1.59.1.3, 1.60.1.7.
 
-For the approved 180-minute rollout, process those lines in the order shown. Inspect live tags/releases, choose the next unused PATCH number within the corresponding line, validate, publish and verify each before proceeding. Never overwrite old releases, tags or assets. Shared binary support for certified hashes does not replace separately labeled per-game packages.
+Configure a separate output directory per target, for example:
 
-## Gates and package
+```text
+cmake -S . -B build/v140/1.57.2.7 -A x64 "-DCMF_ETS2_TARGET=1.57.2.7" "-DSCS_SDK_INCLUDE_DIR=<local-sdk-include>"
+cmake --build build/v140/1.57.2.7 --config Release
+```
 
-Promote only already validated functionality. Retain exact-build fail-closed selection, CAP4 four attempts, and the correct legacy or 1.60 spread ABI. Spread accepts exactly 60/120/180; the recommended active setting is 180. Both behavior-changing gates remain false in the default INI. The separate active example enables CAP4 plus 180-minute Spread; no observers are compiled.
+The target macro restricts both hash recognition and descriptor ownership to one
+descriptor. Runtime metadata names that exact target. Maintenance tests deliberately
+retain the four-descriptor table to validate cross-target metadata; the separately
+compiled scope test uses the same profile definitions as its DLL.
 
-For each release, set coherent plugin/package version and exact game target metadata, build Release x64 from the public snapshot, run focused affected checks and ONE maintenance suite. Do not repeat a private research campaign. Document retained exact-executable evidence separately from fresh file reads and authored native tests; do not imply that an unavailable historical executable was reread.
+Enable CMF_BUILD_TESTS and supply CMF_GAME_EXE as read-only input for maintenance.
+Run the shared native/config/lifecycle suites once; run scope and actual-DLL
+unsupported-host checks for every profile. Do not claim fresh reads of unavailable
+historical executables. Keep gameplay qualification separate from native validation.
 
-Use title `ETS2 Cargo Market Fix vX.Y.Z — ETS2 A.B.C.D` and asset `ETS2-CargoMarketFix-vX.Y.Z-ETS2-A.B.C.D.zip`.
+## Package and publish
 
-Build the ZIP from an empty local staging directory, containing exactly:
+Run `python tools/package_release.py` after all four builds and validation.
+It verifies x64, exactly two exports, only the intended compiled hash, distinct DLL
+hashes, active source/built INI parity, and a strict five-file ZIP allowlist.
+Outputs go to ignored release_staging; sanitized notes/manifests/checksums go to
+releases/<tag>. No publication or deployment is performed by that script.
 
-- CargoMarketFix.dll
-- CargoMarketFix.ini (both patches disabled)
-- config_examples/CargoMarketFix.cap4-spread-active.ini (both ON, 180)
-- README.md (scoped to that exact game/version)
-- LICENSE
+Each ZIP contains CargoMarketFix.dll, ACTIVE CargoMarketFix.ini (CAP4=4,
+Spread1440), target-specific README, MIT LICENSE and the disabled INI example.
+There are no diagnostics, SDK files, test binaries, logs or private tools.
+Only 60/120/180/1440 are accepted. No bridge arithmetic or patch-site changes.
 
-Maintain notes and SHA256SUMS.txt under releases/<tag>. Upload the ZIP and checksum file; record DLL and ZIP hashes with bare filenames. Do not include binaries, logs, SDK/game files, private paths, saves, research, backups or paused work in source commits. Verify exports, default INI parity, active example, ZIP entries/byte identities, sanitized source/artifacts and license.
-
-Commit reviewed source/docs/checksums, push, tag that commit, create the authorized GitHub Release, then verify live metadata, tag commit and downloaded asset hashes. Use the release matching the user's game; never direct them to another game's package.
+Review the source diff and packages, commit source/docs/checksums, push and verify
+the remote commit. Create all four tags at that commit and publish four ordinary
+(non-draft, non-prerelease) releases. Upload each matching ZIP and SHA256SUMS.txt.
+Verify remote tag commits, notes, assets and downloaded bytes. Preserve all old
+releases. If partially published, report exactly what is live and stop on failure;
+do not delete successful releases automatically.
 
 ## Qualification
 
-1.57 is the practically tested reference: 180 reduced recurring freezes to a very small residual stutter on the original very-large-map owned-trailer setup, not complete elimination. 1.58 and 1.59 are structurally validated, without a physical gameplay-performance claim. 1.60 has prior 60-minute live startup evidence, not 180-minute gameplay certification; clean live shutdown/restoration was not confirmed.
-
-Always explain the three-game-hour cycle and up to approximately 179-minute normal offer-refresh delay. Bulk/sleep and trailer activation are not intentionally spread by this scheduler. Unknown hashes fail closed. Historical release notes retain their original qualification/settings and are not rewritten.
+1.57: user-reported physical gameplay test of equivalent private Spread1440
+implementation, heavy map combo / owned trailer / daytime, no observed recurring
+freezes. Public binary is offline validated; no universal guarantee.
+Others: structural only for1440. Historical 1.60 startup smoke is earlier-setting
+evidence, not1440 gameplay or clean-shutdown certification. Explain the roughly
+24-hour normal refresh delay and potentially fewer/less-fresh offers.

@@ -34,8 +34,8 @@ int main(int argc, char** argv) {
         check(init(SCS_TELEMETRY_VERSION_1_00, &api) == SCS_RESULT_invalid_parameter, "H05_incomplete_API");
         api.register_for_event = event_register; api.unregister_from_event = event_unregister;
         api.register_for_channel = channel_register; api.unregister_from_channel = channel_unregister;
-        check(init(SCS_TELEMETRY_VERSION_1_00, &api) == SCS_RESULT_ok,
-              "H06_default_disabled_unknown_host_no_patches_or_observers");
+        check(init(SCS_TELEMETRY_VERSION_1_00, &api) == SCS_RESULT_generic_error,
+              "H06_active_config_unknown_host_rejected_no_patches_or_observers");
         shutdown(); shutdown();
         check(FreeLibrary(module) != 0 && GetModuleHandleW(dll.filename().c_str()) == nullptr,
               "H07_no_PIN_on_unknown_executable");

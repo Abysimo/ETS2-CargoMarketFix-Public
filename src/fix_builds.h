@@ -71,7 +71,23 @@ inline constexpr Descriptor ets160{
     cap4_160_signature.data(),cap4_160_signature.size(),0x0b73,
     Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v160_rcx_rbp,
     {spread_160_signature.data(),spread_160_signature.size(),29,44}};
+// Release profiles restrict BOTH hash recognition and descriptor ownership.
+// The unscoped table remains available to private builds and maintenance tests.
+#if defined(CMF_RELEASE_TARGET)
+#if CMF_RELEASE_TARGET == 157
+inline constexpr std::array supported{&ets157};
+#elif CMF_RELEASE_TARGET == 158
+inline constexpr std::array supported{&ets158};
+#elif CMF_RELEASE_TARGET == 159
+inline constexpr std::array supported{&ets159};
+#elif CMF_RELEASE_TARGET == 160
+inline constexpr std::array supported{&ets160};
+#else
+#error Unsupported CMF_RELEASE_TARGET
+#endif
+#else
 inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160};
+#endif
 inline const Descriptor* identify(std::string_view hash) noexcept {
     for(const auto* d:supported)if(hash==d->sha256)return d;
     return nullptr;

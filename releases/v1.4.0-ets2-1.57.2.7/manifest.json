@@ -1,0 +1,17 @@
+{
+  "target": "1.57.2.7",
+  "tag": "v1.4.0-ets2-1.57.2.7",
+  "executable_sha256": "06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9",
+  "url": "https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.57.2.7",
+  "dll_version": "1.4.0-ets2-1.57.2.7",
+  "dll_bytes": 324096,
+  "dll_sha256": "B5485331CB8A127D78D3A06B3265B951FCF64CD3FD2A7A8137EDE43249436ADC",
+  "zip_name": "ETS2-CargoMarketFix-v1.4.0-ETS2-1.57.2.7.zip",
+  "zip_bytes": 163958,
+  "zip_sha256": "0327799996CA9FFF45AC6CE687F1542B1B5E3789AF06A93035EFC73A54A77F90",
+  "exports": [
+    "scs_telemetry_init",
+    "scs_telemetry_shutdown"
+  ],
+  "qualification": "PHYSICALLY GAMEPLAY TESTED: the user tested the equivalent Spread1440 implementation with CAP4=4 on a heavy real map combo, an owned trailer, and daytime driving where strong recurring freezes had previously been visible. No recurring freezes were observed during that test; gameplay felt smooth. This is not a universal guarantee or a measured FPS result. The newly packaged public DLL has offline validation."
+}

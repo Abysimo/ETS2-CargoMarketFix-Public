@@ -78,7 +78,7 @@ bool validate_site_image(const std::uint8_t* base,std::size_t size,std::uint32_t
     }return matches==1;
 }
 bool Site::prepare() noexcept {
-    if(relay_||(bucket_count_!=60&&bucket_count_!=120&&bucket_count_!=180)||!valid_layout(layout_)||memory_.classify()!=lifecycle::Bytes::original)return false;
+    if(relay_||(bucket_count_!=60&&bucket_count_!=120&&bucket_count_!=180&&bucket_count_!=1440)||!valid_layout(layout_)||memory_.classify()!=lifecycle::Bytes::original)return false;
     const auto p=reinterpret_cast<std::uintptr_t>(target_);
     if(p>UINTPTR_MAX-(layout_.span-1)||!game_.contains(p)||!game_.contains(p+layout_.span-1))return false;
     // Allocate at allocation-granularity steps, within signed CALL rel32 reach.

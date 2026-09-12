@@ -1,5 +1,69 @@
 # Release snapshot validation
 
+## v1.4.0 four exact-target releases — 1440 minutes
+
+Maintained private promotion: c00d659f54a9333bd8c02c3a5a4cb53fd5c833f3.
+The tested 1.57 allowlist extension is retained and supported on all four existing
+descriptors. No production bridge, arithmetic, patch span, CAP4 budget, lifecycle,
+bulk/activation callsite, membership or persistence implementation changed.
+The public release mechanism now requires one compile-time target; each DLL has
+only its intended executable hash. Public INI defaults intentionally changed:
+CAP4 and Spread1440 ACTIVE, observers absent. A disabled example is included.
+
+Private focused checks: **259/259** (legacy Spread 110, v160 Spread 67, descriptors 82).
+Public distinct focused cases: **401/401**:
+
+| Check | Cases |
+| --- | ---: |
+| CAP4 native/config/rollback/containment | 37 |
+| Legacy Spread including 1440 partition | 109 |
+| Release configuration/hash/parity | 18 |
+| Exact four-descriptor signatures/install/restore with 1440 | 65 |
+| Quiesced two-byte backend, including 1000 complete cycles | 37 |
+| v160 native backend including 1440 and 100 boundary cycles | 67 |
+| Four release-profile hash/descriptor/metadata checks | 4 x 10 |
+| Four actual DLLs in unsupported authored hosts | 4 x 7 |
+
+One eight-suite public maintenance run passed 350/350 in 240.62 seconds.
+The all-descriptor subset was then rerun with 1440 publication explicitly asserted
+(65/65). All four profiles passed their scope and host checks, repeated after the
+metadata-only link option that removes absolute PDB paths. The final release
+contract passed 18/18 using CTest's absolute paths; a manual convenience invocation
+with a bare relative INI filename failed R02 because the Windows INI API resolves
+bare filenames differently. That invocation error required no source/assertion
+change. It is not counted as a passing run.
+
+Both native spread ABIs exercised all 1440 bucket residues and N=0,1,1439,1440,1441,
+12921, alongside the retained 60/120/180 matrices. Coverage is ordered, contiguous,
+balanced, bounded and exactly once over a fixed complete cycle. UINT32_MAX minute
+handling is retained. Invalid N/multiplication/addition/end guards precede division
+and remain unchanged; existing native negative-bound tests pass. Nonempty N<1440
+can produce zero-length slices, which take the original end continuation.
+The formula is b=m%B, q=N/B, r=N%B, begin=b*q+min(b,r),
+length=q+(b<r), end=begin+length. Since b<B, end<=N; the validated original
+begin+8*N bounds make derived pointer arithmetic safe without new truncation.
+B=1440 fits the existing immutable positive 32-bit startup field.
+
+Actual installed 1.57 executable hash and exact sites were checked read-only.
+Other versions use unchanged previously certified hashes/signatures and authored
+native images; their original executables were not freshly available/read.
+Only the normal sweep gate is patched by Spread. Bulk and direct activation code
+remain unchanged; this is structural evidence, not new sleep/activation gameplay QA.
+
+Packages are checked for x64, exactly scs_telemetry_init/scs_telemetry_shutdown,
+one intended compiled hash, unique DLL identities, config parity and only five
+approved entries. Source build inputs exclude observers; binary screening rejects
+diagnostic implementation markers. No collector or research tool is packaged.
+See each releases/v1.4.0-ets2-*/manifest.json and SHA256SUMS.txt for identities.
+
+**1.57: PHYSICALLY GAMEPLAY TESTED** by the user with the equivalent private
+Spread1440 build, heavy map combo, owned trailer and daytime driving; no recurring
+freezes observed. The public binaries are offline validated, not newly gameplay
+tested. **1.58/1.59/1.60: STRUCTURALLY VALIDATED**, no physical Spread1440 claim.
+The earlier 1.60 startup smoke is not1440 gameplay or clean-live-shutdown validation.
+No universal freeze/FPS guarantee. Historical records below retain their old
+settings/qualification and do not override v1.4.0's active package defaults.
+
 ## v1.3.1 — ETS2 1.60.1.7 180-minute maintenance
 
 Focused 214/214; one Release maintenance run 313/313, seven suites, 255.57 seconds, no retries. Default patches OFF; active example 180. CAP4/sites/lifecycle unchanged. Exports, package entries, byte identities, default parity and public-safe DLL content verified. The exact target hash/sites/ABI are retained from the previously certified private port; that historical executable was not freshly reread in this rollout. Fresh target-specific authored image tests exercise its exact descriptor, signature isolation, 180 publication, install/restore and fail-closed handling. Native bridge fixtures execute the corresponding validated ABI. The currently installed 1.57 image is also checked read-only by the common maintenance suite; that read is not presented as a fresh 1.60.1.7 executable validation. See [release notes](releases/v1.3.1/RELEASE_NOTES.md) for exact hashes and qualification.

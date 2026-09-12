@@ -117,11 +117,11 @@ int main(){std::setvbuf(stdout,nullptr,_IONBF,0);try{
     mode=2;auto handler=AddVectoredExceptionHandler(1,search);need(handler!=nullptr,"VEH");auto v=visits;s160_fixture(p.data(),60,&e);RemoveVectoredExceptionHandler(handler);mode=0;
     check(searches==1&&visits==v+1&&cmf_refresh_spread_active==0,"continue_execution_once");
     check(owner.stop(site)&&!site.has_allocation()&&!std::memcmp(&s160_site-1,before,sizeof(before)),"exact_eight_restore_relay_release");
-    for(auto period:{60u,120u,180u}){
+    for(auto period:{60u,120u,180u,1440u}){
         spread::Site configured(&s160_site,range(),spread::v160_layout,period);lifecycle::Controller configured_owner;
         need(configured_owner.install(true,configured)&&cmf_refresh_spread_bucket_count==static_cast<LONG>(period),"v160 startup period published");
-        for(auto n:{0u,1u,59u,60u,61u,119u,120u,121u,179u,180u,181u,12921u})cycle(n,s160_fixture,period);
-        check(true,period==60?"configured_60_full_matrix":period==120?"configured_120_full_matrix":"configured_180_full_matrix");
+        for(auto n:{0u,1u,59u,60u,61u,119u,120u,121u,179u,180u,181u,1439u,1440u,1441u,12921u})cycle(n,s160_fixture,period);
+        check(true,period==60?"configured_60_full_matrix":period==120?"configured_120_full_matrix":period==180?"configured_180_full_matrix":"configured_1440_full_matrix");
         need(configured_owner.stop(configured)&&!configured.has_allocation(),"v160 configured restore");
     }
     for(unsigned i=0;i<100;++i){spread::Site s(&s160_site,range(),spread::v160_layout);lifecycle::Controller o;need(o.install(true,s),"repeat install");
