@@ -5,7 +5,7 @@
 
 namespace cmf::fix_builds {
 enum class Cap4WriteStrategy { aligned_atomic16, quiesced_copy2 };
-enum class SpreadBridgeStrategy { legacy_v157_v159, v160_rcx_rbp };
+enum class SpreadBridgeStrategy { legacy_v157_v159, v160_rcx_rbp, v161_empty_rcx_rbp };
 struct SpreadSignature {
     const std::uint8_t* bytes=nullptr; // Null means the established legacy signature only.
     std::size_t size=0,patch_offset=0;
@@ -51,6 +51,15 @@ struct Descriptor {
     SpreadBridgeStrategy spread_strategy=SpreadBridgeStrategy::legacy_v157_v159;
     SpreadSignature spread_signature{};
 };
+inline constexpr auto cap4_161_signature=[] {
+    auto s=cap4_160_signature; s[66]=0x94; return s;
+}();
+inline constexpr std::array<std::uint8_t,53> spread_161_signature{
+    0x44,0x3b,0xbd,0x9c,0x01,0,0,0x74,0x2c,
+    0x48,0x8b,0x45,0x28,0x48,0x8b,0x4d,0x30,0x48,0x8b,0xd8,
+    0x48,0x8d,0x3c,0xc8,0x48,0x3b,0xc7,0x74,0x18,0x0f,0x1f,0x40,0,
+    0x48,0x8b,0x0b,0x48,0x8b,0xd5,0xe8,0x55,0x28,0x33,0,
+    0x48,0x83,0xc3,8,0x48,0x3b,0xdf,0x75,0xec};
 inline constexpr Descriptor ets157{
     "1.57.2.7", "06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9",
     0x006CE618,0x006CE3F0,0x006CEE5B,
@@ -71,6 +80,13 @@ inline constexpr Descriptor ets160{
     cap4_160_signature.data(),cap4_160_signature.size(),0x0b73,
     Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v160_rcx_rbp,
     {spread_160_signature.data(),spread_160_signature.size(),29,44}};
+inline constexpr Descriptor ets161{
+    "1.61.1.0", "4DCB548CAAD924254A60AF7C3BD1DB69DCAF42F7ADF19B5BB5D77EBA2814AF21",
+    0x007CF835,0x007CF5D0,0x007D031C,
+    0x0049AF17,0x0049AB30,0x0049AFC0,0x00332855,0x0049C176,0x007CD7B8,
+    cap4_161_signature.data(),cap4_161_signature.size(),0x0b73,
+    Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v161_empty_rcx_rbp,
+    {spread_161_signature.data(),spread_161_signature.size(),24,40}};
 // Release profiles restrict BOTH hash recognition and descriptor ownership.
 // The unscoped table remains available to private builds and maintenance tests.
 #if defined(CMF_RELEASE_TARGET)
@@ -82,11 +98,13 @@ inline constexpr std::array supported{&ets158};
 inline constexpr std::array supported{&ets159};
 #elif CMF_RELEASE_TARGET == 160
 inline constexpr std::array supported{&ets160};
+#elif CMF_RELEASE_TARGET == 161
+inline constexpr std::array supported{&ets161};
 #else
 #error Unsupported CMF_RELEASE_TARGET
 #endif
 #else
-inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160};
+inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160,&ets161};
 #endif
 inline const Descriptor* identify(std::string_view hash) noexcept {
     for(const auto* d:supported)if(hash==d->sha256)return d;

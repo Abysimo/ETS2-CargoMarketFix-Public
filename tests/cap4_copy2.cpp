@@ -142,7 +142,7 @@ int main(){std::setvbuf(stdout,nullptr,_IONBF,0);try{
     cap4::Site invalid(f.target(),f.range(),0x0b73,static_cast<Strategy>(99));
     check(!invalid.prepare(),"unknown_strategy_refused");
     for(const auto* d:{&fix_builds::ets157,&fix_builds::ets158,&fix_builds::ets159})check(d->cap4_write_strategy==Strategy::aligned_atomic16,"supported_descriptor_remains_atomic16");
-    check(fix_builds::supported.size()==4&&fix_builds::ets160.cap4_write_strategy==Strategy::quiesced_copy2,"four_exact_builds_160_copy2");
+    check(fix_builds::supported.size()==5&&fix_builds::ets160.cap4_write_strategy==Strategy::quiesced_copy2&&fix_builds::ets161.cap4_write_strategy==Strategy::quiesced_copy2,"five_exact_builds_160_161_copy2");
     DWORD handles_before=0,handles_after=0;need(GetProcessHandleCount(GetCurrentProcess(),&handles_before)!=0,"handles before");
     for(unsigned i=0;i<1000;++i){cap4::Site s(f.target(),f.range(),0x0b73,Strategy::quiesced_copy2);Controller c;
         need(f.original()&&!s.quiesced(),"cycle start");

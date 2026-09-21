@@ -22,7 +22,7 @@ int main(){try{
     check(!fix_builds::identify(corrupted),"one_hash_digit_fail_closed");
     auto forged=fix_builds::ets158;
     check(!fix_builds::known(&forged),"arbitrary_descriptor_rejected");
-    constexpr std::size_t size=0x7b0000;
+    constexpr std::size_t size=0x800000;
     auto* image=static_cast<std::uint8_t*>(VirtualAlloc(nullptr,size,MEM_COMMIT|MEM_RESERVE,PAGE_READWRITE));
     if(!image)throw std::runtime_error("allocation");
     for(const auto* build:fix_builds::supported){
@@ -86,10 +86,14 @@ int main(){try{
     check(owner.stop(native)&&(&cap159_site)[0]==0x73&&(&cap159_site)[1]==0x0b,"159_native_exact_restore");
     original=true;for(auto n:inputs)original=original&&cap159_fixture(n)==(n<4?4:(n>10?10:n));
     check(original,"159_native_restored_budget_semantics");
-    check(fix_builds::supported.size()==4&&fix_builds::supported[0]==&fix_builds::ets157&&
+    check(fix_builds::supported.size()==5&&fix_builds::supported[0]==&fix_builds::ets157&&
         fix_builds::supported[1]==&fix_builds::ets158&&fix_builds::supported[2]==&fix_builds::ets159&&
-        fix_builds::supported[3]==&fix_builds::ets160,
+        fix_builds::supported[3]==&fix_builds::ets160&&fix_builds::supported[4]==&fix_builds::ets161,
         "exact_release_supported_set");
+    check(fix_builds::identify(fix_builds::ets161.sha256)==&fix_builds::ets161&&
+        fix_builds::ets161.cap4_write_strategy==fix_builds::Cap4WriteStrategy::quiesced_copy2&&
+        fix_builds::ets161.spread_strategy==fix_builds::SpreadBridgeStrategy::v161_empty_rcx_rbp,"161_exact_strategies");
+    check(!fix_builds::identify("1.61.1.0")&&!fix_builds::identify("1.61.x"),"161_no_version_wildcard");
     cap4::Site wrong_original(&cap159_site,{begin,reinterpret_cast<std::uintptr_t>(&cap159_end)-begin},fix_builds::ets158.cap4_original);
     lifecycle::Controller wrong_owner;
     check(!wrong_owner.install(true,wrong_original)&&!wrong_owner.may_be_live()&&

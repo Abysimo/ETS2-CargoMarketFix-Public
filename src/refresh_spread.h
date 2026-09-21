@@ -9,6 +9,8 @@ extern "C" void cmf_refresh_spread_bridge();
 extern "C" unsigned char cmf_refresh_spread_bridge_end;
 extern "C" void cmf_refresh_spread_bridge_v160();
 extern "C" unsigned char cmf_refresh_spread_bridge_v160_end;
+extern "C" void cmf_refresh_spread_bridge_v161();
+extern "C" unsigned char cmf_refresh_spread_bridge_v161_end;
 extern "C" volatile LONG cmf_refresh_spread_active;
 // Published once before installation. Production's single owner is serialized by
 // lifecycle_mutex and must fully stop before reconfiguration; retained on faults.
@@ -26,6 +28,8 @@ struct Layout {
 };
 inline constexpr Layout legacy_layout{Strategy::legacy_v157_v159,{0x66,0x0f,0x1f,0x84,0,0,0,0,0},9,0x16};
 inline constexpr Layout v160_layout{Strategy::v160_rcx_rbp,{0x0f,0x1f,0x84,0,0,0,0,0,0},8,0x15};
+// Own complete CMP + JE + NOP, not just the insufficient four-byte padding.
+inline constexpr Layout v161_layout{Strategy::v161_empty_rcx_rbp,{0x48,0x3b,0xc7,0x74,0x18,0x0f,0x1f,0x40,0},9,0x16};
 bool valid_layout(const Layout&) noexcept;
 const Layout* layout_for(Strategy) noexcept;
 inline constexpr std::uint32_t target_rva=0x003EC647,region_begin=0x003EC330,region_end=0x003EC677;

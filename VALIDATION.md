@@ -1,5 +1,98 @@
 # Release snapshot validation
 
+## v1.4.0 exact ETS2 1.61.1.0 port
+
+**STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED.**
+No ETS2 process was launched or terminated, no plugin was deployed, and no 1.61
+startup, live shutdown, owned-trailer, sleep/bulk, offer-quality or measured
+freeze-reduction claim is made. Functional version remains 1.4.0, CAP4=4 and
+Spread1440. The existing active INI and disabled example are unchanged.
+
+Exact installed executable: AMD64, **53,296,528 bytes**, FileVersion
+`1.61.1.0 (f02fca2efa7507782071eaccb2e84989cae0cfb2)`, ProductVersion `1.61.1`.
+SHA256 `4DCB548CAAD924254A60AF7C3BD1DB69DCAF42F7ADF19B5BB5D77EBA2814AF21`.
+Only that identity is accepted by this target DLL. Version strings/wildcards,
+unknown hashes and the other four supported targets are rejected by this profile.
+All four old descriptors remain byte-for-byte unchanged; old release assets/tags
+are not replaced. Their original executables were not newly inspected.
+
+### Static correspondence
+
+CAP4 generator range `0x007CF5D0–0x007D031C`; unique clamp signature at
+`0x007CF822`. The candidate builder's output-vector count feeds `[RSP+68]`;
+the clamp writes `[RSP+70]`, consumed by the increment/compare attempt loop.
+Original floor four / middle count / ceiling ten is retained in the unpatched
+fixture. At odd RVA **0x007CF835**, **73 0B -> 90 90** selects the original
+four-budget arm. Existing **quiesced_copy2** is used, never unaligned atomic16.
+
+Normal sweep range `0x0049AB30–0x0049AFC0`. The 1.61 compiler leaves only four
+bytes of padding, so the eight-byte 1.60 layout is explicitly rejected. The new
+**v161_empty_rcx_rbp** strategy owns nine whole bytes at **0x0049AF17**:
+`48 3B C7 74 18 0F 1F 40 00` (CMP/JE/NOP). The bridge reproduces original
+RAX==RDI empty rejection before any minute read. CALL/JRCXZ continues at body
+0x49AF20 or exit 0x49AF34; the backedge targets the body, not the hook.
+Inputs: RCX=count, RAX=begin, RBX=cursor, RDI=end, RBP=economy, minute at +19C.
+Only the intended output range and JRCXZ count change. Incoming flags are dead
+before consumption on both original continuations; other live GPR/FP/stack state
+is preserved. No original game-memory instruction is relocated into generated code.
+
+Normal call 0x49AF26 reaches expiry 0x7CD780, refill 0x7CD820 and generator
+0x7CF5D0. Bulk call 0x49C176 and activation/direct call 0x5C07D8 bypass the spread
+gate. No bulk/activation spreading, persistence mechanism, cache or diagnostics
+were added. Balanced 1440 arithmetic and invalid-bound full-range fallback are
+unchanged; original empty bounds are checked first in the new ABI.
+
+### Focused validation
+
+Private production port: **400 native/host cases + 31 exact-image static checks**.
+The two new-fixture portability corrections below were also validated privately.
+Public focused inventory: **449 cases** (401 in the nine-suite new-target run,
+plus 48 scope cases for the four prior profiles):
+
+Final nine-suite run: **401/401 PASS, 216.31 seconds**. Historical profile checks:
+**48/48 PASS**. After the test-only signature-storage correction, both affected
+ABI suites passed again: **102/102, 21.09 seconds**. No production source changed
+between that complete passing run and the focused fixture rerun.
+
+| Suite | Cases |
+| --- | ---: |
+| CAP4 native/configuration/rollback | 37 |
+| Legacy Spread including 1440 | 109 |
+| Release config/hash/parity | 18 |
+| Five-descriptor signatures/install/restore/isolation | 79 |
+| Quiesced copy2 including 1000 install/restore cycles | 37 |
+| Existing 1.60 native ABI | 67 |
+| New 1.61 native ABI | 35 |
+| Actual production DLL unsupported host | 7 |
+| Five independent exact-release profile scopes | 5 x 12 |
+
+Native coverage includes empty/original-empty, low/high counts, every 1440 residue,
+UINT32_MAX minute, invalid multiplication/addition/end, original continuations,
+GPR/RSP/XMM/x87/MXCSR, C++ unwind, SEH continue-execution, fault-retained lease,
+thread IP in caller/relay/bridge, exact neighbor-preserving restoration, rollback,
+and retained resources on uncertain restoration. This is offline evidence, not a
+claim of clean live game shutdown.
+
+The initial public integration run exposed a too-small authored PE allocation
+(0x7B0000) for the new RVAs. It was corrected to the already validated private
+fixture bound (0x800000), with all assertions retained. An explicit `<string>`
+include replaces reliance on a private transitive header. Review also corrected
+the shared fault fixture to retain its signature in its own layout member, rather
+than a constructor parameter; both affected ABI suites were rerun. The failed
+integration run is not counted as a passing run. None of these changes modifies
+the production patch behavior.
+
+### Release artifact
+
+Runtime `1.4.0-ets2-1.61.1.0`, Release x64, static CRT. The public source list
+contains only the maintained production host/config/patch/lifecycle code. No
+call-cost, membership, historical observers, SDK/game assets, logs or collectors
+are included. Exports exactly `scs_telemetry_init`, `scs_telemetry_shutdown`.
+Source/built/active-example INIs are identical. The new bridge's COFF machine-code,
+unwind-code and runtime-function sections match the private build byte-for-byte.
+Package integrity and final DLL/ZIP identity are in the new target's manifest and
+SHA256SUMS.txt. Historical records below retain their original qualification.
+
 ## v1.4.0 four exact-target releases — 1440 minutes
 
 Maintained private promotion: c00d659f54a9333bd8c02c3a5a4cb53fd5c833f3.

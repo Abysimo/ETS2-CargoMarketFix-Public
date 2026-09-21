@@ -9,6 +9,7 @@ release's executable hash. Do not mix DLLs between game versions.**
 | 1.58.1.4 | [v1.4.0-ets2-1.58.1.4](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.58.1.4) | Structurally validated |
 | 1.59.1.3 | [v1.4.0-ets2-1.59.1.3](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.59.1.3) | Structurally validated |
 | 1.60.1.7 | [v1.4.0-ets2-1.60.1.7](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.60.1.7) | Structurally validated; earlier-settings startup smoke only |
+| 1.61.1.0 | [v1.4.0-ets2-1.61.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.61.1.0) | Structurally validated; no physical gameplay test performed |
 
 Each release has one ZIP, one matching DLL, and SHA256SUMS.txt. Exact executable
 hashes and artifact checksums are in its notes. Other known versions and unknown
@@ -44,6 +45,13 @@ game-minute update. 1440 lowers the maximum company entries per normal slice.
 This is not proof that time of day causes the issue and not a GPU/FPS optimization.
 
 ## Validation and limits
+
+**1.61.1.0 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED.**
+Exact executable SHA256: `4DCB548CAAD924254A60AF7C3BD1DB69DCAF42F7ADF19B5BB5D77EBA2814AF21`.
+The 1.61 port retains CAP4=4 and Spread1440; functional version is still 1.4.0.
+Static and authored native/offline tests passed. No 1.61 startup smoke, clean live
+shutdown, measured freeze reduction, owned-trailer, Cargo Market offer quality or
+sleep/bulk gameplay test is claimed. Earlier gameplay evidence does not apply to 1.61.
 
 **1.57.2.7 — PHYSICALLY GAMEPLAY TESTED:** the user tested the equivalent private
 Spread1440 implementation with CAP4=4 on a heavy real map combo, an owned trailer,

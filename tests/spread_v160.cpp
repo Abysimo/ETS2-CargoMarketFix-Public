@@ -138,7 +138,7 @@ int main(){std::setvbuf(stdout,nullptr,_IONBF,0);try{
     check(s160_regs[3]==0x10038&&s160_regs[3]!=0x10000+8ull*wrongMinute,"minute_ABI_negative_control");
     probe(59,0x10000,0x101e0,&e);check(s160_regs[3]==0x10000&&s160_regs[1]==1,"wrong_count_ABI_negative_control");
     signatures();
-    check(fix_builds::supported.size()==4&&fix_builds::identify("B7DFFE6B27402C7DB6DFD52CF982CD5BF292584138B35E3EB8EFB311814AB3F8")==&fix_builds::ets160,"real_160_exact_recognized");
+    check(fix_builds::supported.size()==5&&fix_builds::identify("B7DFFE6B27402C7DB6DFD52CF982CD5BF292584138B35E3EB8EFB311814AB3F8")==&fix_builds::ets160,"real_160_exact_recognized");
     for(auto f:{Inject::prepare,Inject::writable,Inject::write,Inject::flush,Inject::protection}){
         SpreadFault ops(&s160_site,range(),f);lifecycle::Controller ctl;
         need(!ctl.install(true,ops),"fault unexpectedly installed");

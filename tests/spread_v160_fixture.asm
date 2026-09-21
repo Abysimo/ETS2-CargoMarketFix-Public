@@ -1,6 +1,9 @@
 OPTION CASEMAP:NONE
 EXTERN s160_visit:PROC
 EXTERN cmf_refresh_spread_bridge_v160:PROC
+IFDEF CMF_FIXTURE_161
+EXTERN cmf_refresh_spread_bridge_v161:PROC
+ENDIF
 EXTERN s160_input:QWORD
 EXTERN s160_regs:QWORD
 EXTERN s160_fx_before:BYTE
@@ -29,10 +32,15 @@ s160_fixture PROC FRAME
     mov rbp,r8
     mov rbx,rax
     lea rdi,[rax+rcx*8]
+IFDEF CMF_FIXTURE_161
+s160_site LABEL BYTE
+    DB 48h,3bh,0c7h,74h,18h,0fh,1fh,40h,0
+ELSE
     cmp rax,rdi
     je s160_finish
 s160_site LABEL BYTE
     DB 0fh,1fh,84h,0,0,0,0,0
+ENDIF
 s160_loop LABEL NEAR
     mov rcx,[rbx]
     mov rdx,rbp
@@ -86,7 +94,11 @@ s160_probe PROC FRAME
     mov r15,15151515h
     fxsave64 [s160_fx_before]
     mov [s160_rsp_before],rsp
+IFDEF CMF_FIXTURE_161
+    call cmf_refresh_spread_bridge_v161
+ELSE
     call cmf_refresh_spread_bridge_v160
+ENDIF
     mov [s160_rsp_after],rsp
     fxsave64 [s160_fx_after]
     mov [s160_regs],rax

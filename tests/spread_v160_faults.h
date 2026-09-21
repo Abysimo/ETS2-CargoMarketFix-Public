@@ -1,15 +1,17 @@
 // Test-only deterministic Windows operation failures around real Site suspension,
-// relay allocation and exact eight-byte WindowsPatchMemory transactions.
+// relay allocation and layout-sized WindowsPatchMemory transactions.
 enum class Inject {prepare,writable,write,flush,protection,restore,none};
 struct SpreadFault final:cmf::lifecycle::Operations,cmf::lifecycle::PatchMemory {
-    cmf::spread::Site site;std::array<std::uint8_t,8> detour{};DWORD protection=0;bool pending=false;
+    cmf::spread::Site site;std::array<std::uint8_t,9> detour{};DWORD protection=0;bool pending=false;
+    const cmf::spread::Layout layout;
     cmf::WindowsPatchMemory memory;Inject inject;bool once=false,frozen=false;unsigned writes=0;bool bad_order=false;
-    SpreadFault(unsigned char* p,cmf::MemoryRange r,Inject i):site(p,r,cmf::spread::v160_layout),
-        memory(p,cmf::spread::v160_layout.original.data(),detour.data(),8,protection,pending),inject(i){}
+    SpreadFault(unsigned char* p,cmf::MemoryRange r,Inject i,cmf::spread::Layout l=cmf::spread::v160_layout):
+        site(p,r,l,1440),layout(l),
+        memory(p,layout.original.data(),detour.data(),layout.span,protection,pending),inject(i){}
     bool prepare()noexcept override{
         if(inject==Inject::prepare)return false;
         if(!site.prepare())return false;
-        detour={0xe8,0,0,0,0,0xe3,0x15,0x90};
+        detour={0xe8,0,0,0,0,0xe3,layout.empty_displacement,0x90,0x90};
         auto delta=static_cast<std::int32_t>(site.relay_range().begin-reinterpret_cast<std::uintptr_t>(&s160_site+5));
         std::memcpy(detour.data()+1,&delta,4);return true;
     }

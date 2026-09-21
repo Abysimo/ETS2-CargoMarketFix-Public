@@ -8,7 +8,8 @@ namespace cmf {
 namespace spread {
 const Layout* layout_for(Strategy strategy) noexcept {
     switch(strategy){case Strategy::legacy_v157_v159:return &legacy_layout;
-        case Strategy::v160_rcx_rbp:return &v160_layout;}return nullptr;
+        case Strategy::v160_rcx_rbp:return &v160_layout;
+        case Strategy::v161_empty_rcx_rbp:return &v161_layout;}return nullptr;
 }
 bool valid_layout(const Layout& layout) noexcept {
     const auto* expected=layout_for(layout.strategy);
@@ -103,6 +104,10 @@ bool Site::prepare() noexcept {
     return true;
 }
 MemoryRange Site::bridge_range() const noexcept {
+    if(layout_.strategy==Strategy::v161_empty_rcx_rbp) {
+        const auto b=reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge_v161);
+        return {b,reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge_v161_end)-b};
+    }
     const auto begin=layout_.strategy==Strategy::v160_rcx_rbp?
         reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge_v160):reinterpret_cast<std::uintptr_t>(&cmf_refresh_spread_bridge);
     const auto end=layout_.strategy==Strategy::v160_rcx_rbp?
