@@ -1,4 +1,4 @@
-# v1.4.0 exact-target release workflow
+# Exact-target release workflow
 
 This is a sanitized release snapshot. Development and validation originate in the
 private repository; AGENTS.md remains authoritative. Publication needs explicit
@@ -7,8 +7,10 @@ convention without rewriting any older release.
 
 ## Build profiles
 
-Product version 1.4.0; tags are `v1.4.0-ets2-<exact version>`.
-Supported profile values: 1.57.2.7, 1.58.1.4, 1.59.1.3, 1.60.1.7, 1.61.1.0.
+The new 1.61.1.1 target uses functional version 1.4.1 and tag
+`v1.4.1-ets2-1.61.1.1`. The prior five 1.4.0 profiles and releases stay intact.
+Supported exact profiles: 1.57.2.7, 1.58.1.4, 1.59.1.3, 1.60.1.7,
+1.61.1.0, 1.61.1.1.
 
 Configure a separate output directory per target, for example:
 
@@ -19,7 +21,7 @@ cmake --build build/v140/1.57.2.7 --config Release
 
 The target macro restricts both hash recognition and descriptor ownership to one
 descriptor. Runtime metadata names that exact target. Maintenance tests deliberately
-retain the five-descriptor table to validate cross-target metadata; the separately
+retain the six-descriptor table to validate cross-target metadata; the separately
 compiled scope test uses the same profile definitions as its DLL.
 
 Enable CMF_BUILD_TESTS and supply CMF_GAME_EXE as read-only input for maintenance.
@@ -29,7 +31,7 @@ historical executables. Keep gameplay qualification separate from native validat
 
 ## Package and publish
 
-For a new compatibility port, run `python tools/package_release.py --target 1.61.1.0`
+For this compatibility port, run `python tools/package_release.py --target 1.61.1.1 --build-root build/v141`
 after that exact-target build and validation. This writes only the new target's
 package/notes/checksums and leaves historical releases untouched. Omitting `--target`
 packages every configured target and should not be used merely to add a new port.
@@ -53,7 +55,9 @@ do not delete successful releases automatically.
 
 ## Qualification
 
-1.61.1.0: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED**.
+1.61.1.1: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED**.
+No live startup, physical gameplay, or live shutdown was tested for this build.
+1.61.1.0 remains a separate 1.4.0 release with the same qualification.
 No startup, live shutdown, owned-trailer, measured freeze reduction, sleep/bulk or
 offer-quality gameplay claim. This limitation is explicit user scope, not an omitted test.
 

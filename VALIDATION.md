@@ -1,5 +1,46 @@
 # Release snapshot validation
 
+## v1.4.1 exact ETS2 1.61.1.1 port
+
+**STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED.**
+The installed AMD64 PE32+ executable is 53,299,600 bytes, FileVersion and
+ProductVersion 1.61.1.1, SHA256
+`2014BFCC850A06108F4CA3C233A5BB6D31D7D83346C5D449F94C8E0675E5199A`.
+This new hash differs from 1.61.1.0. The new release has its own exact-build
+profile; unknown hashes and the other five known builds fail closed in its DLL.
+
+The current-trailer generator's unwind family moved to `0x7CF780–0x7D04CC`.
+Candidate-builder output count reaches `[RSP+68]`, and the original floor-four,
+middle-count, ceiling-ten clamp stores its limit at `[RSP+70]`, consumed by the
+attempt loop at `0x7D0290`. At odd RVA `0x7CF9E5`, original `73 0B` is replaced
+with `90 90` through the existing quiesced-copy2 backend, selecting the original
+four-budget arm. The 70-byte clamp signature is exact and unique in this image.
+
+The normal refresh sweep is still `0x49AB30–0x49AFC0`, with the v161 nine-byte
+bridge at `0x49AF17` (`48 3B C7 74 18 0F 1F 40 00`). Begin/count are
+`[RBP+28]/[RBP+30]`, economy RBP, minute `+0x19C`, cursor RBX and end RDI.
+The new exact signature has call displacement `0x00332A05`, reaching expiry
+`0x7CD930`. The empty path and normal body continuations are unchanged. Bulk
+calls expiry separately at `0x49C176`; direct activation at `0x5C07F0–0x5C08EC`
+resets, refills and calls generator directly. Neither route enters the normal
+spread gate. The bridge, CAP4 budget and 1440 arithmetic are unchanged.
+
+The private bounded read-only validator passed **27 exact-image assertions**.
+Focused private native fixtures passed **253/253 cases** in four suites, and the
+private production-only host test passed. The public exact-target Release build
+passed **416/416 offline cases** across nine suites (214.75 seconds): release
+scope 14, CAP4 37, Spread 109, release contract 18, host 7, six-descriptor
+matrix 92, quiesced copy2 37, v160 ABI 67, and v161 ABI 35. The copy2 fixture
+completed 1000 install/restore cycles. No historical executable was newly
+read or physically tested for this update.
+The maintained native fixtures cover CAP4's odd two-byte write, Spread1440
+arithmetic, empty/low/high company counts, register/stack/FP preservation,
+exception paths, quiescence, install/restore, rollback and containment. The
+public exact-target test inventory and artifact hashes are recorded in this
+target's release manifest. No ETS2 process was launched or deployed to; no
+startup, owned-trailer gameplay, measured freeze reduction, offer quality,
+sleep/bulk gameplay or clean live shutdown claim is made for this executable.
+
 ## v1.4.0 exact ETS2 1.61.1.0 port
 
 **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED.**

@@ -14,6 +14,7 @@ TARGETS = {
     "1.59.1.3": "E6FE1A58DF9D0BFFF21DCCC12B4F581DC0D3E3B5885DBF62ED05028DE794D35C",
     "1.60.1.7": "B7DFFE6B27402C7DB6DFD52CF982CD5BF292584138B35E3EB8EFB311814AB3F8",
     "1.61.1.0": "4DCB548CAAD924254A60AF7C3BD1DB69DCAF42F7ADF19B5BB5D77EBA2814AF21",
+    "1.61.1.1": "2014BFCC850A06108F4CA3C233A5BB6D31D7D83346C5D449F94C8E0675E5199A",
 }
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -46,6 +47,11 @@ def exports(data):
     return sorted(result)
 
 def qualification(version):
+    if version == "1.61.1.1":
+        return ("STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED. "
+                "Exact-image static analysis and native/offline checks passed. ETS2 was not "
+                "launched: no startup smoke, measured freeze reduction, owned-trailer gameplay, "
+                "Cargo Market offers, sleep/bulk gameplay or clean live shutdown was tested.")
     if version == "1.61.1.0":
         return ("STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED. "
                 "Static exact-image analysis and authored native/offline regression checks passed. "
@@ -65,6 +71,8 @@ def qualification(version):
             "validation is claimed." + extra)
 
 def notes(version, exe_hash):
+    if version == "1.61.1.1":
+        return notes1611(exe_hash)
     if version == "1.61.1.0":
         return notes161(exe_hash)
     return f"""# ETS2 Cargo Market Fix v1.4.0 — ETS2 {version}
@@ -153,12 +161,13 @@ def main():
     for version, exe_hash in TARGETS.items():
         if args.target and version != args.target:
             continue
-        tag = f"v1.4.0-ets2-{version}"
+        release_version = "1.4.1" if version == "1.61.1.1" else "1.4.0"
+        tag = f"v{release_version}-ets2-{version}"
         dll = (args.build_root/version/"Release"/"CargoMarketFix.dll").read_bytes()
         assert (args.build_root/version/"Release"/"CargoMarketFix.ini").read_bytes() == cfg
         found = [v for v, h in TARGETS.items() if h.encode() in dll]
         assert found == [version], (version, "unexpected compiled hash set", found)
-        assert f"1.4.0-ets2-{version}".encode() in dll
+        assert f"{release_version}-ets2-{version}".encode() in dll
         for forbidden in [b"cmf_call_cost", b"CMF_DIAGNOSTIC_CALLS", b"cmf_membership_entry_bridge",
                           b"spread_density", b"cmf_observation_runtime", b"cmf_internal_destination_bridge"]:
             assert forbidden not in dll, forbidden
@@ -166,7 +175,7 @@ def main():
         text = notes(version, exe_hash).encode("utf-8")
         stage = ROOT/"release_staging"/tag
         stage.mkdir(parents=True, exist_ok=True)
-        filename = f"ETS2-CargoMarketFix-v1.4.0-ETS2-{version}.zip"
+        filename = f"ETS2-CargoMarketFix-v{release_version}-ETS2-{version}.zip"
         files = {"CargoMarketFix.dll": dll, "CargoMarketFix.ini": cfg, "README.md": text,
                  "LICENSE": (ROOT/"LICENSE").read_bytes(),
                  "config_examples/CargoMarketFix.disabled.ini":
@@ -189,7 +198,7 @@ def main():
         (docs/"SHA256SUMS.txt").write_text(sums, encoding="utf-8", newline="\n")
         record = dict(target=version, tag=tag, executable_sha256=exe_hash,
                       url=f"https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/{tag}",
-                      dll_version=f"1.4.0-ets2-{version}", dll_bytes=len(dll), dll_sha256=sha(dll),
+                      dll_version=f"{release_version}-ets2-{version}", dll_bytes=len(dll), dll_sha256=sha(dll),
                       zip_name=filename, zip_bytes=len(zipped), zip_sha256=sha(zipped),
                       exports=export_names, qualification=qualification(version))
         (docs/"manifest.json").write_text(json.dumps(record, indent=2)+"\n", encoding="utf-8", newline="\n")
@@ -254,6 +263,57 @@ original executables were not newly available for inspection. See VALIDATION.md.
 
 Five files: DLL, active INI, this README, MIT LICENSE and disabled INI example.
 Verify the DLL and ZIP against SHA256SUMS.txt. No private research/logs are included.
+"""
+
+def notes1611(exe_hash):
+    return f"""# ETS2 Cargo Market Fix v1.4.1 — ETS2 1.61.1.1
+
+**Only ETS2 1.61.1.1, Windows x64. Native telemetry plugin, not an .scs mod.**
+
+Required eurotrucks2.exe SHA256: `{exe_hash}`
+
+Runtime version: `1.4.1-ets2-1.61.1.1`. This is an exact-build compatibility
+update, not a new algorithm. Previous ETS2 1.61.1.0 and older releases remain
+available unchanged. Other exact-target DLLs and unknown executables fail closed.
+
+## Behavior and installation
+
+The active INI enables CAP4's current-trailer attempt budget of **4** and spreads
+the normal company refresh over **1440 game minutes (24 game hours)**. Bulk/sleep
+processing and direct trailer activation remain unspread.
+
+Close ETS2. Back up the current CargoMarketFix.dll and CargoMarketFix.ini. Copy
+**both** files from this ZIP into `Euro Truck Simulator 2/bin/win_x64/plugins/`.
+To disable both patches, close ETS2 and use the supplied disabled example as
+CargoMarketFix.ini, or remove the plugin while the game is closed. Do not mix
+DLLs and INIs across target releases. The executable on disk is never edited.
+
+The DLL contains no research observers, call-cost diagnostics, membership hooks,
+collectors or network telemetry. Only the intended SCS telemetry exports exist.
+
+## Trade-off
+
+Normal company refresh may be delayed up to roughly 24 in-game hours. Offers
+may temporarily be fewer or less fresh. Time jumps or changing company lists
+are not a fixed-snapshot guarantee. No save format or persistent cache is added,
+but changed scheduling can affect offers later saved. Removing the plugin does
+not retroactively recreate earlier offers.
+
+## Validation and limitations
+
+{qualification('1.61.1.1')}
+
+Static analysis proved the exact new CAP4 branch and budget dataflow, the
+nine-byte normal-sweep bridge site, and the separate bulk and activation routes.
+Native/offline fixtures cover 1440-bucket arithmetic, empty/low/high counts,
+register and FP preservation, install/restore, rollback, containment, exception
+paths and quiescence. No physical gameplay or performance claim is made for this
+new executable. See VALIDATION.md for the exact evidence.
+
+## Integrity
+
+The ZIP contains CargoMarketFix.dll, active CargoMarketFix.ini, this README,
+MIT LICENSE, and a disabled INI example. Verify DLL and ZIP with SHA256SUMS.txt.
 """
 
 if __name__ == "__main__":

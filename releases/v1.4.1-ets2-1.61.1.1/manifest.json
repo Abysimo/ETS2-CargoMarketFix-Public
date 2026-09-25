@@ -1,0 +1,17 @@
+{
+  "target": "1.61.1.1",
+  "tag": "v1.4.1-ets2-1.61.1.1",
+  "executable_sha256": "2014BFCC850A06108F4CA3C233A5BB6D31D7D83346C5D449F94C8E0675E5199A",
+  "url": "https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.1-ets2-1.61.1.1",
+  "dll_version": "1.4.1-ets2-1.61.1.1",
+  "dll_bytes": 325632,
+  "dll_sha256": "A50AD2630956539A894871CF01911F459CD94137B54ED8C5B38C47A759D8D117",
+  "zip_name": "ETS2-CargoMarketFix-v1.4.1-ETS2-1.61.1.1.zip",
+  "zip_bytes": 163862,
+  "zip_sha256": "422C10FC699B90BD6585BD89F4ECE6EDB6E5C64ADF0D3C8BCA6837D79F2EC430",
+  "exports": [
+    "scs_telemetry_init",
+    "scs_telemetry_shutdown"
+  ],
+  "qualification": "STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED. Exact-image static analysis and native/offline checks passed. ETS2 was not launched: no startup smoke, measured freeze reduction, owned-trailer gameplay, Cargo Market offers, sleep/bulk gameplay or clean live shutdown was tested."
+}

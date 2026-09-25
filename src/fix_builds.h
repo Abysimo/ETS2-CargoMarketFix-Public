@@ -60,6 +60,11 @@ inline constexpr std::array<std::uint8_t,53> spread_161_signature{
     0x48,0x8d,0x3c,0xc8,0x48,0x3b,0xc7,0x74,0x18,0x0f,0x1f,0x40,0,
     0x48,0x8b,0x0b,0x48,0x8b,0xd5,0xe8,0x55,0x28,0x33,0,
     0x48,0x83,0xc3,8,0x48,0x3b,0xdf,0x75,0xec};
+inline constexpr auto spread_1611_signature=[] {
+    auto s=spread_161_signature;
+    s[40]=0x05; s[41]=0x2a;
+    return s;
+}();
 inline constexpr Descriptor ets157{
     "1.57.2.7", "06C465048626DE0463B5FC7D4FE69DE917556AFB8CE99159DFB912F6D2806BF9",
     0x006CE618,0x006CE3F0,0x006CEE5B,
@@ -87,6 +92,13 @@ inline constexpr Descriptor ets161{
     cap4_161_signature.data(),cap4_161_signature.size(),0x0b73,
     Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v161_empty_rcx_rbp,
     {spread_161_signature.data(),spread_161_signature.size(),24,40}};
+inline constexpr Descriptor ets1611{
+    "1.61.1.1", "2014BFCC850A06108F4CA3C233A5BB6D31D7D83346C5D449F94C8E0675E5199A",
+    0x007CF9E5,0x007CF780,0x007D04CC,
+    0x0049AF17,0x0049AB30,0x0049AFC0,0x00332A05,0x0049C176,0x007CD968,
+    cap4_161_signature.data(),cap4_161_signature.size(),0x0b73,
+    Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v161_empty_rcx_rbp,
+    {spread_1611_signature.data(),spread_1611_signature.size(),24,40}};
 // Release profiles restrict BOTH hash recognition and descriptor ownership.
 // The unscoped table remains available to private builds and maintenance tests.
 #if defined(CMF_RELEASE_TARGET)
@@ -100,11 +112,13 @@ inline constexpr std::array supported{&ets159};
 inline constexpr std::array supported{&ets160};
 #elif CMF_RELEASE_TARGET == 161
 inline constexpr std::array supported{&ets161};
+#elif CMF_RELEASE_TARGET == 162
+inline constexpr std::array supported{&ets1611};
 #else
 #error Unsupported CMF_RELEASE_TARGET
 #endif
 #else
-inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160,&ets161};
+inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160,&ets161,&ets1611};
 #endif
 inline const Descriptor* identify(std::string_view hash) noexcept {
     for(const auto* d:supported)if(hash==d->sha256)return d;
