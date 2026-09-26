@@ -55,11 +55,15 @@ do not delete successful releases automatically.
 
 ## Qualification
 
-1.61.1.1: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED**.
-No live startup, physical gameplay, or live shutdown was tested for this build.
-1.61.1.0 remains a separate 1.4.0 release with the same qualification.
-No startup, live shutdown, owned-trailer, measured freeze reduction, sleep/bulk or
-offer-quality gameplay claim. This limitation is explicit user scope, not an omitted test.
+1.61.1.1: **STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED**.
+The exact executable was physically run in a smaller-map setup with a private
+diagnostic build retaining the production CAP4 and Spread1440 logic. A/B sessions
+confirmed selected-bucket versus full-range normal sweeps, no observed fallback
+or range failure, and clean diagnostic shutdown/restoration. The public ZIP DLL
+was not the instrumented binary. Large-map freeze reduction, owned-trailer
+large-map performance, sleep/bulk and offer quality remain unvalidated on this
+exact target. 1.61.1.0 remains a separate 1.4.0 release with its original
+structural-only qualification.
 
 1.57: user-reported physical gameplay test of equivalent private Spread1440
 implementation, heavy map combo / owned trailer / daytime, no observed recurring

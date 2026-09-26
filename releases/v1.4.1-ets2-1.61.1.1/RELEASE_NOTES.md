@@ -33,14 +33,32 @@ not retroactively recreate earlier offers.
 
 ## Validation and limitations
 
-STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED. Exact-image static analysis and native/offline checks passed. ETS2 was not launched: no startup smoke, measured freeze reduction, owned-trailer gameplay, Cargo Market offers, sleep/bulk gameplay or clean live shutdown was tested.
+**STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED.**
+Exact-image static analysis and native/offline checks passed. The exact ETS2
+1.61.1.1 executable was also physically run with a private diagnostic build
+retaining the production CAP4 and Spread1440 logic. In a smaller-map A/B test,
+Mode A (CAP4=4, Spread1440 ON) selected normal-sweep buckets over 2,043
+companies: 31 sweeps, no fallback or range-consistency failure, maximum
+captured sweep about 88.7 us. Mode B (both OFF) traversed the full range:
+37 sweeps, maximum captured sweep about 92.569 ms. Game-minute progression
+and clean diagnostic shutdown/restoration were observed. Outside-sweep
+Destination totals were 14,576 (A) and 24,830 (B); these sessions differ in
+length and do not establish a normalized speedup.
+
+The public ZIP DLL was not the diagnostic binary and the ZIP assets remain
+unchanged. Its bundled README reflects the qualification at publication time;
+this updated online release note is the current qualification. The 1.61.1.1
+large-map recurring-freeze scenario was not reproduced or physically validated.
+No universal stutter elimination, owned-trailer large-map performance,
+sleep/bulk gameplay, or exhaustive offer-quality claim is made.
 
 Static analysis proved the exact new CAP4 branch and budget dataflow, the
 nine-byte normal-sweep bridge site, and the separate bulk and activation routes.
 Native/offline fixtures cover 1440-bucket arithmetic, empty/low/high counts,
 register and FP preservation, install/restore, rollback, containment, exception
-paths and quiescence. No physical gameplay or performance claim is made for this
-new executable. See VALIDATION.md for the exact evidence.
+paths and quiescence. See the current repository
+[VALIDATION.md](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/VALIDATION.md)
+for the later physical diagnostic evidence and its limitations.
 
 ## Integrity
 

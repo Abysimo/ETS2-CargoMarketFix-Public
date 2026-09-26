@@ -2,7 +2,7 @@
 
 ## v1.4.1 exact ETS2 1.61.1.1 port
 
-**STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED.**
+**STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED.**
 The installed AMD64 PE32+ executable is 53,299,600 bytes, FileVersion and
 ProductVersion 1.61.1.1, SHA256
 `2014BFCC850A06108F4CA3C233A5BB6D31D7D83346C5D449F94C8E0675E5199A`.
@@ -37,9 +37,42 @@ The maintained native fixtures cover CAP4's odd two-byte write, Spread1440
 arithmetic, empty/low/high company counts, register/stack/FP preservation,
 exception paths, quiescence, install/restore, rollback and containment. The
 public exact-target test inventory and artifact hashes are recorded in this
-target's release manifest. No ETS2 process was launched or deployed to; no
-startup, owned-trailer gameplay, measured freeze reduction, offer quality,
-sleep/bulk gameplay or clean live shutdown claim is made for this executable.
+target's release manifest. The release build/packaging step did not launch ETS2;
+the later diagnostic sessions below supplied separate physical runtime evidence.
+
+### Subsequent physical runtime evidence on the exact 1.61.1.1 executable
+
+A private `1.4.1-ets2-1.61.1.1-runtime-diag1` build was run in real ETS2 with
+the same production CAP4 and Spread1440 patch logic and additional read-only
+timing/count instrumentation. This was **not** the public ZIP DLL. The executable
+SHA256 was the exact target hash above; the diagnostic DLL SHA256 was
+`927D5120D579C35EE9AFB837895F1EF313596A062B6832BCB146B7F452A13404`.
+The diagnostic used a relatively small
+map setup, not the historical large-map freeze reproduction.
+
+| Runtime cohort | Mode A: CAP4=4, Spread1440 ON | Mode B: both OFF |
+| --- | ---: | ---: |
+| Companies | 2,043 | 2,043 |
+| Completed normal sweeps | 31 | 37 |
+| Spread fallback / range failures | 0 / 0 | 0 / 0 |
+| Maximum captured normal sweep | 88.7 us | 92.569 ms |
+| Outside-sweep Destination calls | 14,576 | 24,830 |
+| Dropped rows / I/O errors | 0 / 0 | 0 / 0 |
+| Clean diagnostic shutdown/restoration | yes | yes |
+
+Mode A selected the intended normal-sweep bucket; Mode B traversed the full
+company range. Sequential game-minute progression and clean diagnostic
+shutdown/restoration were observed. The outside-sweep Destination counts are
+absolute totals from different-length sessions, so they are not a per-minute
+speedup estimate or proof of a specific causal percentage. They support the
+observed CAP4 reduction in this A/B context.
+
+This verifies live operation of the production CAP4/Spread logic on 1.61.1.1.
+It does **not** validate large-map recurring-freeze reduction on this exact
+target, universal stutter elimination, owned-trailer large-map performance,
+sleep/bulk gameplay, or exhaustive Cargo Market offer quality. The public DLL
+remains the unchanged offline-validated release artifact; the diagnostic DLL
+and capture files are not part of the public package.
 
 ## v1.4.0 exact ETS2 1.61.1.0 port
 

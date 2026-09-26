@@ -13,5 +13,5 @@
     "scs_telemetry_init",
     "scs_telemetry_shutdown"
   ],
-  "qualification": "STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED. Exact-image static analysis and native/offline checks passed. ETS2 was not launched: no startup smoke, measured freeze reduction, owned-trailer gameplay, Cargo Market offers, sleep/bulk gameplay or clean live shutdown was tested."
+  "qualification": "STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED. Exact ETS2 1.61.1.1 executable tested with a private diagnostic build retaining production CAP4/Spread1440 logic. Smaller-map A/B sessions observed bucket versus full-range sweeps, zero fallback/range failures, and clean diagnostic shutdown/restoration. Public ZIP DLL and assets are unchanged. Large-map recurring-freeze reduction was not physically validated on this target."
 }

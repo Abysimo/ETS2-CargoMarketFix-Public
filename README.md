@@ -10,7 +10,7 @@ release's executable hash. Do not mix DLLs between game versions.**
 | 1.59.1.3 | [v1.4.0-ets2-1.59.1.3](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.59.1.3) | Structurally validated |
 | 1.60.1.7 | [v1.4.0-ets2-1.60.1.7](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.60.1.7) | Structurally validated; earlier-settings startup smoke only |
 | 1.61.1.0 | [v1.4.0-ets2-1.61.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.61.1.0) | Structurally validated; no physical gameplay test performed |
-| 1.61.1.1 | [v1.4.1-ets2-1.61.1.1](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.1-ets2-1.61.1.1) | Structurally validated; no physical gameplay test performed |
+| 1.61.1.1 | [v1.4.1-ets2-1.61.1.1](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.1-ets2-1.61.1.1) | Live runtime diagnostically verified; large-map freeze reduction untested |
 
 Each release has one ZIP, one matching DLL, and SHA256SUMS.txt. Exact executable
 hashes and artifact checksums are in its notes. Other known versions and unknown
@@ -47,12 +47,21 @@ This is not proof that time of day causes the issue and not a GPU/FPS optimizati
 
 ## Validation and limits
 
-**1.61.1.1 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED.**
+**1.61.1.1 — STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED.**
 Exact executable SHA256: `2014BFCC850A06108F4CA3C233A5BB6D31D7D83346C5D449F94C8E0675E5199A`.
 This exact-build 1.4.1 port retains CAP4=4 and Spread1440. Static and native/offline
-tests passed. ETS2 was not launched: no startup smoke, measured freeze reduction,
-owned-trailer gameplay, Cargo Market offer-quality, sleep/bulk gameplay or clean
-live shutdown is claimed for this executable.
+tests passed. The real game was then run on this exact executable with a private
+diagnostic build using the production CAP4/Spread logic. Mode A (both fixes ON)
+captured 31 normal sweeps over 2,043 companies, with no Spread fallback or range
+failure and a maximum observed sweep of about 88.7 us. Mode B (both OFF) captured
+37 full normal sweeps, with a maximum of about 92.569 ms. Game-minute progression,
+normal bucket selection, and clean diagnostic shutdown/restoration were observed.
+The compared outside-sweep Destination counts were 14,576 (A) and 24,830 (B);
+these differently sized sessions do not establish a normalized speedup.
+The public ZIP DLL itself was not used for this diagnostic run. The relatively
+small map setup did not reproduce the large-map recurring freeze on 1.61.1.1;
+its reduction remains physically unvalidated on this target. Owned-trailer
+large-map performance, sleep/bulk behavior, and offer quality were not certified.
 
 **1.61.1.0 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED.**
 Exact executable SHA256: `4DCB548CAAD924254A60AF7C3BD1DB69DCAF42F7ADF19B5BB5D77EBA2814AF21`.
