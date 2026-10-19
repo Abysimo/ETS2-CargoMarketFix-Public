@@ -10,7 +10,7 @@ int main() {
         if (!ok) { std::printf("FAIL %s\n", name); return false; }
         ++cases; std::printf("PASS %s\n", name); return true;
     };
-    for (const auto* d : {&ets157, &ets158, &ets159, &ets160, &ets161, &ets1611}) {
+    for (const auto* d : {&ets157, &ets158, &ets159, &ets160, &ets161, &ets1611, &ets1619}) {
         const bool intended = d == supported[0];
         if (!check((identify(d->sha256) == d) == intended, d->version)) return 1;
         if (!check(known(d) == intended, "descriptor ownership scope")) return 1;

@@ -1,5 +1,67 @@
 # Release snapshot validation
 
+## v1.4.2 exact ETS2 1.61.1.9 port
+
+**STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**
+Exact Windows x64 executable: FileVersion/ProductVersion 1.61.1.9, 53,308,304
+bytes, SHA256 `B70C2357CC56EB5834EE47FEA3C60B2F2D4591383FF2AC479CFD3CD254301B8C`.
+Private validated source commit: `1c655e2b736038d9ed5cf7cdfb9a9b8890adadf6`.
+This same-branch compatibility port uses fix 1.4.2, retains all six old descriptors,
+and restricts the new release DLL's identity and ownership to this exact target.
+No unknown-build or signature matching rule was relaxed.
+
+Fresh analysis re-identified generator family `0x7CFBA0–0x7D08EC`. The candidate
+builder writes output-vector count `[RBP-48]`, copied to `[RSP+68]`; the original
+clamp remains floor four, middle count, ceiling ten. At odd RVA `0x7CFE05`,
+whole branch `73 0B -> 90 90` selects the existing four arm. `[RSP+70]` is the
+attempt budget consumed at `0x7D06B0`. The unchanged quiesced-copy2 backend is
+required; an unaligned atomic16 write is not used.
+
+Normal sweep family `0x49AC40–0x49B0D0` has its unique nine-byte gate at
+`0x49B027`: `48 3B C7 74 18 0F 1F 40 00`. The retained v161 bridge is correct
+for RAX=begin, RCX=count, RBX=cursor, RDI=end, RBP=economy, unsigned minute
+`[RBP+0x19C]`. It preserves original empty rejection before the minute read;
+body continuation is `0x49B030`, end `0x49B044`. Incoming flags are dead and
+the loop backedge never re-enters the gate. The exact call displacement is
+`0x00332D15`, reaching expiry `0x7CDD50`, then refill `0x7CDDF0` and generator.
+Bulk calls expiry at `0x49C286`; direct activation at `0x5C0980–0x5C0A7C`
+resets company state and calls refill/generator directly. Both bypass Spread.
+No bridge implementation, 1440 arithmetic, CAP4 budget or persistence logic changed.
+
+Private focused validation passed **30 exact-image assertions, 415 native
+assertions and 19 production-host assertions**. Native checks include all seven
+descriptors, negative signatures, original/fixed budget semantics, bounded
+1440 partitions, empty/low/high counts, register/FP/stack state, C++/SEH/fault
+paths, quiescence, rollback, containment and 1000 complete copy2 install/restore
+cycles. Historical executables were not reread; their retained descriptors and
+native fixtures provide regression evidence. The private host explicitly
+verified that valid active config reaches the unsupported-hash gate. The
+separate public production parser and active config are unchanged.
+
+The new public exact-target Release run passed **431/431 assertions across
+nine suites**, once, in **337.26 seconds**: exact scope 16, CAP4 37, legacy
+Spread 109, release contract 18, unsupported host 7, seven-descriptor matrix
+105, quiesced copy2 37, v160 ABI 67, and v161 ABI 35. This includes the retained
+1000-cycle copy2 stress. A first configure command split an unquoted dotted
+target value in PowerShell and was rejected; quoting that argument corrected
+the invocation without a source change. No failed test run was substituted.
+The public/private v161 bridge machine-code, unwind-code and runtime-function
+object sections are byte-identical. The first bounded inspector expected the
+COFF name .text rather than .text$mn; accepting the actual section name completed
+that comparison without changing code.
+
+The package verifier confirmed x64, exactly scs_telemetry_init and
+scs_telemetry_shutdown, only the intended compiled executable hash/version,
+source/built/active-example INI parity, and exactly five allowed ZIP entries.
+The production source list and binary screening exclude research diagnostics.
+No old release directory or asset was regenerated. DLL/ZIP identities are in
+`releases/v1.4.2-ets2-1.61.1.9/manifest.json` and its SHA256SUMS.txt.
+
+This new exact target was not launched, deployed or physically gameplay-tested.
+No actual freeze reduction, large-map, owned-trailer, sleep/bulk, offer-quality,
+or clean live shutdown claim is made. The 1.61.1.1 live diagnostic qualification
+below remains valid only for that older exact target.
+
 ## v1.4.1 exact ETS2 1.61.1.1 port
 
 **STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED.**

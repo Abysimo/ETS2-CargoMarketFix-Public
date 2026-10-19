@@ -7,10 +7,12 @@ convention without rewriting any older release.
 
 ## Build profiles
 
-The new 1.61.1.1 target uses functional version 1.4.1 and tag
-`v1.4.1-ets2-1.61.1.1`. The prior five 1.4.0 profiles and releases stay intact.
+The new 1.61.1.9 target uses functional version 1.4.2 and tag
+`v1.4.2-ets2-1.61.1.9`. Existing profiles and releases stay intact, including
+the separately qualified `v1.4.1-ets2-1.61.1.1`.
 Supported exact profiles: 1.57.2.7, 1.58.1.4, 1.59.1.3, 1.60.1.7,
-1.61.1.0, 1.61.1.1.
+1.61.1.0, 1.61.1.1, 1.61.1.9. Game updates within the same branch increment
+the fix PATCH; a new game branch increments MINOR and resets PATCH. MAJOR is retained.
 
 Configure a separate output directory per target, for example:
 
@@ -21,7 +23,7 @@ cmake --build build/v140/1.57.2.7 --config Release
 
 The target macro restricts both hash recognition and descriptor ownership to one
 descriptor. Runtime metadata names that exact target. Maintenance tests deliberately
-retain the six-descriptor table to validate cross-target metadata; the separately
+retain the seven-descriptor table to validate cross-target metadata; the separately
 compiled scope test uses the same profile definitions as its DLL.
 
 Enable CMF_BUILD_TESTS and supply CMF_GAME_EXE as read-only input for maintenance.
@@ -31,7 +33,7 @@ historical executables. Keep gameplay qualification separate from native validat
 
 ## Package and publish
 
-For this compatibility port, run `python tools/package_release.py --target 1.61.1.1 --build-root build/v141`
+For this compatibility port, run `python tools/package_release.py --target 1.61.1.9 --build-root build/v142`
 after that exact-target build and validation. This writes only the new target's
 package/notes/checksums and leaves historical releases untouched. Omitting `--target`
 packages every configured target and should not be used merely to add a new port.
@@ -54,6 +56,12 @@ releases. If partially published, report exactly what is live and stop on failur
 do not delete successful releases automatically.
 
 ## Qualification
+
+1.61.1.9: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**.
+Fresh static/native/offline validation applies to its exact executable hash.
+No live startup/shutdown, measured freeze reduction, large-map, owned-trailer,
+sleep/bulk or offer-quality test is claimed. Do not transfer the historical
+1.61.1.1 live diagnostic qualification to this new target.
 
 1.61.1.1: **STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED**.
 The exact executable was physically run in a smaller-map setup with a private
