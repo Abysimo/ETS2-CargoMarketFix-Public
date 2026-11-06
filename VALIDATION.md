@@ -1,5 +1,80 @@
 # Release snapshot validation
 
+## v1.5.0 exact ETS2 1.62.1.0 port
+
+**STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**
+Required executable SHA256:
+`A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956`.
+Windows AMD64 PE32+, 53,746,064 bytes; FileVersion 1.62.1.0, ProductVersion
+1.62.1. The four-component file version names the exact release target.
+Validated private source: `c72f2c1f13fe1d8f1a695830e3af6b397384a55c`.
+The new game branch uses fix 1.5.0. All seven older descriptors are retained;
+the new public profile scopes both identity and ownership to this one exact hash.
+
+### Fresh semantics, not signature matching alone
+
+The new current-trailer generator family is `0x7BB610–0x7BC373`. Its frame
+changed from 0x1670 to 0x1680. Candidate builder `0x7BAF10–0x7BB0A1` fills
+an output vector at `[RBP-50]`; its +0x10 count, `[RBP-40]`, is loaded into
+`[RSP+70]`. The builder's independent scalar return is not that count. The
+original clamp remains floor four / middle count / ceiling ten, but its exact
+70-byte signature changed with the stack layout. Whole branch `73 0B` at
+`0x7BB878` becomes `90 90`, selecting the existing four store at `0x7BB87A`.
+The new budget slot `[RSP+78]` is consumed by the real increment/compare loop
+at `0x7BC130/0x7BC137`. The target is aligned; current production's validated
+quiesced-copy2 backend is retained and still refuses unquiesced writes. A new
+authored native fixture matches all 70 clamp bytes and exercises the new stack
+slots, original/fixed/restored clamp and attempt-counter semantics.
+
+The normal company sweep family is `0x4A5B70–0x4A6000`. At the gate, RAX is
+begin, RCX count, RBX cursor, RDI end and RBP economy; minute remains unsigned
+`[RBP+0x19C]`. Owned span `0x4A5F57` is exactly nine bytes:
+`48 3B C7 74 18 0F 1F 40 00`. Body/end continuations are `0x4A5F60/0x4A5F74`;
+the backedge targets the body, never the gate. Original empty behavior precedes
+any minute read. Fresh analysis checked live inputs, post-loop restoration,
+dead incoming flags, stack alignment and unwind assumptions against the actual
+maintained v161 bridge. That strategy is ABI-correct for 1.62; no new bridge or
+bucket algorithm was introduced. The 53-byte signature is unique, with exact
+call displacement `0x00313805`.
+
+Normal expiry at `0x7B9770` performs pre-mutation at `0x7B97A8`, then calls
+refill `0x7B9810` and generator `0x7BB610`. Bulk/sleep family
+`0x4A6F10–0x4A731D` calls expiry at `0x4A7116` using its full original range.
+Direct activation `0x5BEDE0–0x5BEEDC` resets company +0x50 and calls refill
+and generator directly at `0x5BEE3D/0x5BEE48`. Neither route enters the normal
+Spread gate. The current balanced Spread1440 formula and existing invalid-bound
+full-range fallback remain unchanged; no seed horizon, cache, accepted-vector,
+RNG or persistence code was changed.
+
+### Focused evidence and limits
+
+Private validation passed **39 bounded exact-image assertions, 443 native
+assertions and 20 production-host assertions**. This includes all eight
+descriptors, the new 12-case 1.62 clamp fixture, all 1440 bucket residues for
+empty/low/boundary/medium/high counts (including 2043), remainder distribution,
+UINT32_MAX minute, register/stack/FP preservation, exceptions, continue-execution,
+quiescence, exact restore, rollback and containment. The retained write backend
+completed 1000 install/restore cycles. Tests were not retried. The maintained
+bridge's machine-code/unwind/runtime-function sections are byte-identical to
+the prior 1.61.1.9 build. Historical executables were not freshly reread; their
+unchanged descriptors and authored fixtures provide regression evidence.
+
+The public x64 Release build passed all **10 suites / 459 named assertions**
+in one run, with no failures or retries: exact release scope 18, CAP4 37,
+legacy Spread 109, release contract 18, public host 7, descriptor matrix 118,
+quiesced-copy2 37, v160 bridge 67, v161 bridge 36 and new 1.62 clamp 12.
+CTest recorded 288.97 seconds of test execution. Private and public v161 bridge
+machine-code/unwind/runtime-function sections are byte-identical. The public
+DLL has exactly the two SCS exports and contains no diagnostic or native-fixture
+markers. Source, built and packaged active INIs agree; the disabled example
+is also included. The five-file ZIP and SHA256SUMS were verified locally.
+
+This exact 1.62 executable was only inspected read-only, never launched or
+deployed to. No live startup, measured freeze reduction, large-map or owned-trailer
+gameplay, sleep/bulk gameplay, offer-quality, clean live shutdown or Convoy test
+is claimed. The 1.61.1.1 runtime diagnostic qualification below remains historical
+evidence only for that exact older executable. Previous releases are unchanged.
+
 ## v1.4.2 exact ETS2 1.61.1.9 port
 
 **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**

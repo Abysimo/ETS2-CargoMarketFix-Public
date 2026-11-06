@@ -111,6 +111,25 @@ inline constexpr Descriptor ets1619{
     cap4_161_signature.data(),cap4_161_signature.size(),0x0b73,
     Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v161_empty_rcx_rbp,
     {spread_1619_signature.data(),spread_1619_signature.size(),24,40}};
+// 1.62 moved the candidate count/budget stack slots; retain a separate exact signature.
+inline constexpr std::array<std::uint8_t,70> cap4_162_signature{
+    0x48,0x83,0x7c,0x24,0x70,0x04,0xb9,0xff,0xff,0xff,0xff,0x48,0x89,0x75,0x50,
+    0xc6,0x45,0x78,0x01,0x73,0x0b,0x48,0xc7,0x44,0x24,0x78,0x04,0,0,0,0xeb,0x26,
+    0x48,0x83,0x7c,0x24,0x70,0x0a,0x76,0x0b,0x48,0xc7,0x44,0x24,0x78,0x0a,0,0,0,
+    0xeb,0x13,0x48,0x8b,0x44,0x24,0x70,0x48,0x89,0x44,0x24,0x78,0x48,0x85,0xc0,
+    0x0f,0x84,0xa8,0x08,0,0};
+inline constexpr auto spread_162_signature=[] {
+    auto s=spread_161_signature;
+    s[40]=0x05; s[41]=0x38; s[42]=0x31;
+    return s;
+}();
+inline constexpr Descriptor ets162{
+    "1.62.1.0", "A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956",
+    0x007BB878,0x007BB610,0x007BC373,
+    0x004A5F57,0x004A5B70,0x004A6000,0x00313805,0x004A7116,0x007B97A8,
+    cap4_162_signature.data(),cap4_162_signature.size(),0x0b73,
+    Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v161_empty_rcx_rbp,
+    {spread_162_signature.data(),spread_162_signature.size(),24,40}};
 // Release profiles restrict BOTH hash recognition and descriptor ownership.
 // The unscoped table remains available to private builds and maintenance tests.
 #if defined(CMF_RELEASE_TARGET)
@@ -128,11 +147,13 @@ inline constexpr std::array supported{&ets161};
 inline constexpr std::array supported{&ets1611};
 #elif CMF_RELEASE_TARGET == 163
 inline constexpr std::array supported{&ets1619};
+#elif CMF_RELEASE_TARGET == 164
+inline constexpr std::array supported{&ets162};
 #else
 #error Unsupported CMF_RELEASE_TARGET
 #endif
 #else
-inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160,&ets161,&ets1611,&ets1619};
+inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160,&ets161,&ets1611,&ets1619,&ets162};
 #endif
 inline const Descriptor* identify(std::string_view hash) noexcept {
     for(const auto* d:supported)if(hash==d->sha256)return d;

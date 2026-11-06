@@ -51,7 +51,7 @@ int main(){try{
     check(blocks(site,reinterpret_cast<std::uintptr_t>(&s160_loop)),"quiescence_caller");
     check(blocks(site,site.relay_range().begin),"quiescence_relay");
     check(blocks(site,site.bridge_range().begin),"quiescence_bridge");
-    for(unsigned n:{0u,1u,1439u,1440u,1441u,12921u}){
+    for(unsigned n:{0u,1u,1439u,1440u,1441u,2043u,12921u}){
         std::vector<Company> c(n);std::vector<Company*> p;for(auto& x:c)p.push_back(&x);
         for(unsigned m=0;m<1440;++m){Economy e;e.minute=m;auto before=visits;
             s160_fixture(p.data(),n,&e);

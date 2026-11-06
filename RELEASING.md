@@ -7,23 +7,23 @@ convention without rewriting any older release.
 
 ## Build profiles
 
-The new 1.61.1.9 target uses functional version 1.4.2 and tag
-`v1.4.2-ets2-1.61.1.9`. Existing profiles and releases stay intact, including
-the separately qualified `v1.4.1-ets2-1.61.1.1`.
+The new 1.62.1.0 target uses functional version 1.5.0 and tag
+`v1.5.0-ets2-1.62.1.0`. Existing profiles and releases stay intact, including
+`v1.4.2-ets2-1.61.1.9` and the separately qualified `v1.4.1-ets2-1.61.1.1`.
 Supported exact profiles: 1.57.2.7, 1.58.1.4, 1.59.1.3, 1.60.1.7,
-1.61.1.0, 1.61.1.1, 1.61.1.9. Game updates within the same branch increment
+1.61.1.0, 1.61.1.1, 1.61.1.9, 1.62.1.0. Game updates within the same branch increment
 the fix PATCH; a new game branch increments MINOR and resets PATCH. MAJOR is retained.
 
 Configure a separate output directory per target, for example:
 
 ```text
-cmake -S . -B build/v140/1.57.2.7 -A x64 "-DCMF_ETS2_TARGET=1.57.2.7" "-DSCS_SDK_INCLUDE_DIR=<local-sdk-include>"
-cmake --build build/v140/1.57.2.7 --config Release
+cmake -S . -B build/v150/1.62.1.0 -A x64 "-DCMF_ETS2_TARGET=1.62.1.0" "-DSCS_SDK_INCLUDE_DIR=<local-sdk-include>"
+cmake --build build/v150/1.62.1.0 --config Release
 ```
 
 The target macro restricts both hash recognition and descriptor ownership to one
 descriptor. Runtime metadata names that exact target. Maintenance tests deliberately
-retain the seven-descriptor table to validate cross-target metadata; the separately
+retain the eight-descriptor table to validate cross-target metadata; the separately
 compiled scope test uses the same profile definitions as its DLL.
 
 Enable CMF_BUILD_TESTS and supply CMF_GAME_EXE as read-only input for maintenance.
@@ -33,7 +33,7 @@ historical executables. Keep gameplay qualification separate from native validat
 
 ## Package and publish
 
-For this compatibility port, run `python tools/package_release.py --target 1.61.1.9 --build-root build/v142`
+For this compatibility port, run `python tools/package_release.py --target 1.62.1.0 --build-root build/v150`
 after that exact-target build and validation. This writes only the new target's
 package/notes/checksums and leaves historical releases untouched. Omitting `--target`
 packages every configured target and should not be used merely to add a new port.
@@ -56,6 +56,12 @@ releases. If partially published, report exactly what is live and stop on failur
 do not delete successful releases automatically.
 
 ## Qualification
+
+1.62.1.0: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**.
+Fresh exact-image and native/offline evidence applies only to its exact hash.
+No live startup/shutdown, measured freeze reduction, large-map/owned-trailer,
+sleep/bulk, offer-quality or Convoy gameplay test is claimed. The older 1.61.1.1
+live-runtime qualification must not be inherited by this new 1.62 target.
 
 1.61.1.9: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**.
 Fresh static/native/offline validation applies to its exact executable hash.

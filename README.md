@@ -1,4 +1,4 @@
-# ETS2 Cargo Market Fix v1.4.2
+# ETS2 Cargo Market Fix v1.5.0
 
 **Choose the release matching your EXACT ETS2 version. Each DLL accepts only that
 release's executable hash. Do not mix DLLs between game versions.**
@@ -12,12 +12,13 @@ release's executable hash. Do not mix DLLs between game versions.**
 | 1.61.1.0 | [v1.4.0-ets2-1.61.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.0-ets2-1.61.1.0) | Structurally validated; no physical gameplay test performed |
 | 1.61.1.1 | [v1.4.1-ets2-1.61.1.1](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.1-ets2-1.61.1.1) | Live runtime diagnostically verified; large-map freeze reduction untested |
 | 1.61.1.9 | [v1.4.2-ets2-1.61.1.9](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.2-ets2-1.61.1.9) | Structurally validated; no physical gameplay test on this exact build |
+| 1.62.1.0 | [v1.5.0-ets2-1.62.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.0-ets2-1.62.1.0) | Structurally validated; no physical gameplay test on this exact build |
 
 Each release has one ZIP, one matching DLL, and SHA256SUMS.txt. Exact executable
 hashes and artifact checksums are in its notes. Other known versions and unknown
 builds fail closed. Older releases remain available with their original settings.
 
-## Install — both patches are ACTIVE in v1.4.x packages
+## Install — both patches are ACTIVE in current packages
 
 1. Close ETS2. Back up any existing CargoMarketFix DLL and INI.
 2. Download the ZIP for your exact game version from the table.
@@ -34,19 +35,31 @@ To disable both patches, close the game and replace CargoMarketFix.ini with
 `config_examples/CargoMarketFix.disabled.ini` (renamed CargoMarketFix.ini), or
 remove the DLL while the game is closed. The executable on disk is never patched.
 
-## What changed
+## Maintained behavior
 
 CAP4 keeps the fixed four-attempt current-trailer Cargo Market generation limit.
-The recommended active Refresh Spread changes from 180 to **1440 game minutes
+The active Refresh Spread remains **1440 game minutes
 (24 game hours)**. It distributes the normal company sweep into balanced contiguous
 slices without a backlog or adaptive scheduler. Accepted settings are exactly
 60, 120, 180 and 1440; unsupported/malformed settings fail closed, not clamped.
+Version 1.5.0 adds exact 1.62 compatibility; this balanced bucket algorithm is unchanged.
 
 180-minute spreading could still cluster many expensive regenerations in one
 game-minute update. 1440 lowers the maximum company entries per normal slice.
 This is not proof that time of day causes the issue and not a GPU/FPS optimization.
 
 ## Validation and limits
+
+**1.62.1.0 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**
+Required eurotrucks2.exe SHA256: `A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956`.
+Runtime `1.5.0-ets2-1.62.1.0` is a Windows x64 native telemetry DLL. CAP4=4
+and the current balanced Spread1440 bucket algorithm are retained. Fresh semantic
+analysis verified the changed generator stack layout, new CAP4 signature, exact
+normal sweep ABI and separate bulk/activation routes; focused static/native/offline
+validation passed. Its DLL accepts only this executable hash; other builds fail
+closed. No live startup/shutdown, freeze reduction, large-map/owned-trailer,
+sleep/bulk, offer-quality or Convoy gameplay test is claimed. Historical live
+diagnostic evidence on 1.61.1.1 does not constitute a live test of 1.62.
 
 **1.61.1.9 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**
 Required executable SHA256: `B70C2357CC56EB5834EE47FEA3C60B2F2D4591383FF2AC479CFD3CD254301B8C`.
