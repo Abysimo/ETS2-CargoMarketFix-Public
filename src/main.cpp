@@ -67,6 +67,7 @@ SCSAPI_RESULT scs_telemetry_init(scs_u32_t version, const scs_telemetry_init_par
             (spread_requested && !spread.start(config, exact, logger, build))) {
             stop();
             logger.write("Installation failed closed");
+            logger.flush();
             return SCS_RESULT_generic_error;
         }
         logger.write("Initialization complete; observers off");

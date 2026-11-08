@@ -47,6 +47,7 @@ class Site final:public lifecycle::Operations {
     Memory memory_;
     MemoryRange range_;
     SuspendedThreads suspended_;
+    QuiescenceDebug quiescence_debug_{};
 public:
     const char* freeze_reason=nullptr;
     Site(std::uint8_t* target,MemoryRange range,std::uint16_t original=0x0a73,
@@ -54,16 +55,23 @@ public:
         target_(target),strategy_(strategy),memory_(target,original,strategy,&quiesced_),range_(range){}
     ~Site() override {thaw();}
     bool quiesced() const noexcept {return quiesced_;}
+    const QuiescenceDebug& quiescence_debug() const noexcept {return quiescence_debug_;}
+    void log_prepatch_quiescence(Logger&, MemoryRange image,
+                                 const fix_builds::Descriptor&) const noexcept;
     bool prepare() noexcept override;
     bool pin_module() noexcept override {return pin_hook_module();}
     void publish() noexcept override {}
     void recording(bool) noexcept override {}
     bool freeze() noexcept override {
         quiesced_=false;
-        quiesced_=suspended_.acquire(std::array<MemoryRange,1>{range_},freeze_reason);
+        quiesced_=suspended_.acquire(std::array<MemoryRange,1>{range_},freeze_reason,
+                                    &quiescence_debug_);
         return quiesced_;
     }
-    void thaw() noexcept override {quiesced_=false;suspended_.release();}
+    void thaw() noexcept override {
+        quiesced_=false;
+        suspended_.release(&quiescence_debug_);
+    }
     // No new callable resources, and no calls inside the patched clamp window.
     // This is not an active-frame census. Suspended IPs exclude the whole RE003.
     bool no_active_calls() noexcept override {return true;}
