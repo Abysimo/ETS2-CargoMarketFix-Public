@@ -1,5 +1,34 @@
 # Release snapshot validation
 
+## v1.4.3 / v1.5.1 transient thread exit recovery
+
+The external Debug 1 run on exact ETS2 1.61.1.9 reached CAP4 target validation,
+then failed with `OpenThread` error 87 after suspending and inspecting 96 threads.
+The external Debug 2 run encountered one such error on pass 0, stabilized on
+clean pass 1 with 104 threads suspended, installed CAP4 at budget 4, and activated
+Spread1440. Initialization completed with observers off. This validates the
+installation recovery on the reporting machine.
+
+Both production builds use the same four-pass guard. A null `OpenThread` with
+`ERROR_INVALID_PARAMETER` keeps prior suspensions in place, leaves the failed
+ID unseen, and disqualifies that pass from stabilization. A later complete pass
+must see no new live threads and no transient open errors. The offline fixture
+exercises the reported sequence, reuse of the failed numeric ID, repeated errors,
+persistent churn, every other fatal failure, cleanup, and patch-before-thaw
+ordering. The production DLLs have no verbose debug blocks or test API stubs.
+
+The exact 1.61.1.9 image passed a read-only recheck. Both release scopes, exact
+descriptors, and the CAP4/Spread lifecycle passed native and offline validation.
+Private validation passed 30 image checks, 428 native and lifecycle checks
+including the 15 recovery cases and 1,000 CAP4 install and restore cycles,
+and 20 production host checks. Public validation passed 186 checks across
+the two build profiles, including each DLL's exact scope and offline host.
+The 1.62.1.0 descriptor and patch code retain the exact-image proof documented
+below. The exact 1.62.1.0 image was not reread for this change. The external
+evidence validates startup recovery on 1.61.1.9 via Debug 2. It establishes no
+new live shutdown or large-map performance result and no physical 1.62 gameplay
+result. The entries below describe their original releases.
+
 ## v1.5.0 exact ETS2 1.62.1.0 port
 
 **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**

@@ -103,7 +103,9 @@ bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log,co
         {reinterpret_cast<std::uintptr_t>(base)+build->generator_begin,build->generator_end-build->generator_begin},
         build->cap4_original,build->cap4_write_strategy);
     if(!controller_.install(true,*site_)){
-        log.write(std::string("CAP4 installation refused: ")+controller_.reason());return false;
+        std::string message=std::string("CAP4 installation refused: ")+controller_.reason();
+        if(site_->freeze_reason) message+=std::string("; quiescence=")+site_->freeze_reason;
+        log.write(message);return false;
     }
     log.write("CAP4 installed; budget=4");return true;
 }

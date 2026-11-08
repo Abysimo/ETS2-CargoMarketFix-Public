@@ -7,9 +7,9 @@ convention without rewriting any older release.
 
 ## Build profiles
 
-The new 1.62.1.0 target uses functional version 1.5.0 and tag
-`v1.5.0-ets2-1.62.1.0`. Existing profiles and releases stay intact, including
-`v1.4.2-ets2-1.61.1.9` and the separately qualified `v1.4.1-ets2-1.61.1.1`.
+The shared startup fix ships as `v1.5.1-ets2-1.62.1.0` and
+`v1.4.3-ets2-1.61.1.9`. Previous releases and diagnostic prereleases
+retain their own source tags, files and qualifications.
 Supported exact profiles: 1.57.2.7, 1.58.1.4, 1.59.1.3, 1.60.1.7,
 1.61.1.0, 1.61.1.1, 1.61.1.9, 1.62.1.0. Game updates within the same branch increment
 the fix PATCH; a new game branch increments MINOR and resets PATCH. MAJOR is retained.
@@ -17,8 +17,8 @@ the fix PATCH; a new game branch increments MINOR and resets PATCH. MAJOR is ret
 Configure a separate output directory per target, for example:
 
 ```text
-cmake -S . -B build/v150/1.62.1.0 -A x64 "-DCMF_ETS2_TARGET=1.62.1.0" "-DSCS_SDK_INCLUDE_DIR=<local-sdk-include>"
-cmake --build build/v150/1.62.1.0 --config Release
+cmake -S . -B build/v151/1.62.1.0 -A x64 "-DCMF_ETS2_TARGET=1.62.1.0" "-DSCS_SDK_INCLUDE_DIR=<local-sdk-include>"
+cmake --build build/v151/1.62.1.0 --config Release
 ```
 
 The target macro restricts both hash recognition and descriptor ownership to one
@@ -33,8 +33,9 @@ historical executables. Keep gameplay qualification separate from native validat
 
 ## Package and publish
 
-For this compatibility port, run `python tools/package_release.py --target 1.62.1.0 --build-root build/v150`
-after that exact-target build and validation. This writes only the new target's
+Run `python tools/package_release.py --target 1.62.1.0 --build-root build/v151`
+and repeat with `--target 1.61.1.9` after each exact-target build and validation.
+Each invocation writes only the selected target's
 package/notes/checksums and leaves historical releases untouched. Omitting `--target`
 packages every configured target and should not be used merely to add a new port.
 It verifies x64, exactly two exports, only the intended compiled hash, distinct DLL
@@ -57,17 +58,14 @@ do not delete successful releases automatically.
 
 ## Qualification
 
-1.62.1.0: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**.
-Fresh exact-image and native/offline evidence applies only to its exact hash.
-No live startup/shutdown, measured freeze reduction, large-map/owned-trailer,
-sleep/bulk, offer-quality or Convoy gameplay test is claimed. The older 1.61.1.1
-live-runtime qualification must not be inherited by this new 1.62 target.
+1.62.1.0 v1.5.1 is **STRUCTURALLY VALIDATED / SHARED QUIESCENCE FIX LIVE-VALIDATED ON 1.61.1.9**.
+The exact descriptor and image proof from v1.5.0 are retained. Physical
+gameplay after the guard change has not been tested on this exact target.
 
-1.61.1.9: **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**.
-Fresh static/native/offline validation applies to its exact executable hash.
-No live startup/shutdown, measured freeze reduction, large-map, owned-trailer,
-sleep/bulk or offer-quality test is claimed. Do not transfer the historical
-1.61.1.1 live diagnostic qualification to this new target.
+1.61.1.9 v1.4.3 is **LIVE INSTALLATION FIX VALIDATED ON ETS2 1.61.1.9**.
+The external Debug 2 startup confirmed recovery and installation. The
+production DLL passed offline checks. Large-map performance and live
+shutdown remain unverified.
 
 1.61.1.1: **STRUCTURALLY VALIDATED / LIVE RUNTIME DIAGNOSTIC TEST PASSED**.
 The exact executable was physically run in a smaller-map setup with a private

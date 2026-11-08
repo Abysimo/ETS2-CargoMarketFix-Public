@@ -6,6 +6,7 @@
 #include <cstddef>
 namespace cmf {
 constexpr std::size_t kMaximumSuspendedThreads=256;
+constexpr unsigned kMaximumQuiescencePasses=4;
 struct MemoryRange final {
     std::uintptr_t begin = 0;
     std::size_t size = 0;
@@ -34,7 +35,7 @@ public:
         // Require a subsequent complete snapshot with no unseen process
         // threads. Bound both storage and closure attempts; never treat an
         // enumeration error as end-of-list. No process attachment is used.
-        for (unsigned pass = 0; pass < 4; ++pass) {
+        for (unsigned pass = 0; pass < kMaximumQuiescencePasses; ++pass) {
             const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
             if (snapshot == INVALID_HANDLE_VALUE) {
                 reason = "thread_snapshot_failed"; release(); return false;
@@ -45,7 +46,7 @@ public:
                 CloseHandle(snapshot); reason = "thread_enumeration_failed";
                 release(); return false;
             }
-            bool success = true, added = false;
+            bool success = true, added = false, saw_transient_exit = false;
             do {
                 if (entry.th32OwnerProcessID != process_id ||
                     entry.th32ThreadID == current_thread_id) continue;
@@ -58,7 +59,15 @@ public:
                 }
                 HANDLE thread = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT |
                     THREAD_QUERY_INFORMATION, FALSE, entry.th32ThreadID);
-                if (!thread) { reason = "open_thread_failed"; success = false; break; }
+                if (!thread) {
+                    if (GetLastError() == ERROR_INVALID_PARAMETER) {
+                        // A snapshot entry may have exited. Keep existing suspensions
+                        // and leave this ID unseen so any replacement is checked.
+                        saw_transient_exit = true;
+                        continue;
+                    }
+                    reason = "open_thread_failed"; success = false; break;
+                }
                 if (SuspendThread(thread) == static_cast<DWORD>(-1)) {
                     CloseHandle(thread); reason = "suspend_thread_failed"; success = false; break;
                 }
@@ -87,7 +96,7 @@ public:
             }
             CloseHandle(snapshot);
             if (!success) { release(); return false; }
-            if (pass != 0 && !added) return true;
+            if (pass != 0 && !added && !saw_transient_exit) return true;
         }
         reason = "thread_set_did_not_stabilize";
         release(); return false;

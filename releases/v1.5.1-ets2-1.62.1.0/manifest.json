@@ -1,0 +1,17 @@
+{
+  "target": "1.62.1.0",
+  "tag": "v1.5.1-ets2-1.62.1.0",
+  "executable_sha256": "A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956",
+  "url": "https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.1-ets2-1.62.1.0",
+  "dll_version": "1.5.1-ets2-1.62.1.0",
+  "dll_bytes": 325632,
+  "dll_sha256": "C03F874CE0B8474AD7387D2FDA5FA819A4FEB4571A00FB3873825DCF3D89463E",
+  "zip_name": "ETS2-CargoMarketFix-v1.5.1-ETS2-1.62.1.0.zip",
+  "zip_bytes": 163676,
+  "zip_sha256": "2F8AB649F00A5D515ECE615A79C2DCF4687F1C7D72D92CC3AF46AF857C0426FC",
+  "exports": [
+    "scs_telemetry_init",
+    "scs_telemetry_shutdown"
+  ],
+  "qualification": "STRUCTURALLY VALIDATED / SHARED QUIESCENCE FIX LIVE-VALIDATED ON 1.61.1.9. This release retains the prior exact-image proof for 1.62.1.0 and passed new native and offline checks. Physical gameplay on 1.62.1.0 after this change has not been tested."
+}

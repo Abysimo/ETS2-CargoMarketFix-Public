@@ -19,6 +19,7 @@ TARGETS = {
     "1.62.1.0": "A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956",
 }
 ROOT = Path(__file__).resolve().parents[1]
+RELEASE_VERSIONS = {"1.62.1.0": "1.5.1", "1.61.1.9": "1.4.3", "1.61.1.1": "1.4.1"}
 
 def sha(data):
     return hashlib.sha256(data).hexdigest().upper()
@@ -50,18 +51,16 @@ def exports(data):
 
 def qualification(version):
     if version == "1.62.1.0":
-        return ("STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD. "
-                "Fresh exact-image semantic proof and focused native/offline validation passed. "
-                "No live startup, measured freeze reduction, large-map or owned-trailer gameplay, "
-                "sleep/bulk gameplay, offer-quality, clean live shutdown or Convoy testing is "
-                "claimed for ETS2 1.62.1.0. Historical live diagnostic evidence on exact ETS2 "
-                "1.61.1.1 does not constitute a live test of 1.62.")
+        return ("STRUCTURALLY VALIDATED / SHARED QUIESCENCE FIX LIVE-VALIDATED ON 1.61.1.9. "
+                "This release retains the prior exact-image proof for 1.62.1.0 and passed new "
+                "native and offline checks. Physical gameplay on 1.62.1.0 after this change "
+                "has not been tested.")
     if version == "1.61.1.9":
-        return ("STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD. "
-                "Exact-image semantic analysis and native/offline validation passed. No live startup, "
-                "measured freeze reduction, large-map or owned-trailer gameplay, sleep/bulk gameplay, "
-                "offer-quality or clean live shutdown test is claimed for ETS2 1.61.1.9. Historical "
-                "live runtime diagnostic evidence belongs only to the separate exact ETS2 1.61.1.1 target.")
+        return ("LIVE INSTALLATION FIX VALIDATED ON ETS2 1.61.1.9. "
+                "An external Debug 2 run recovered from the reported OpenThread failure, "
+                "installed CAP4, and activated Spread1440. The production DLL passed native "
+                "and offline validation. The external result covers startup installation. "
+                "Large-map gameplay performance and live shutdown were not validated by that run.")
     if version == "1.61.1.1":
         return ("STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED. "
                 "Exact-image static analysis and native/offline checks passed. ETS2 was not "
@@ -86,10 +85,8 @@ def qualification(version):
             "validation is claimed." + extra)
 
 def notes(version, exe_hash):
-    if version == "1.62.1.0":
-        return notes162(exe_hash)
-    if version == "1.61.1.9":
-        return notes1619(exe_hash)
+    if version in {"1.61.1.9", "1.62.1.0"}:
+        return notes_quiescence(version, exe_hash)
     if version == "1.61.1.1":
         return notes1611(exe_hash)
     if version == "1.61.1.0":
@@ -180,16 +177,18 @@ def main():
     for version, exe_hash in TARGETS.items():
         if args.target and version != args.target:
             continue
-        release_version = {"1.62.1.0": "1.5.0", "1.61.1.9": "1.4.2", "1.61.1.1": "1.4.1"}.get(version, "1.4.0")
+        release_version = RELEASE_VERSIONS.get(version, "1.4.0")
         tag = f"v{release_version}-ets2-{version}"
         dll = (args.build_root/version/"Release"/"CargoMarketFix.dll").read_bytes()
         assert (args.build_root/version/"Release"/"CargoMarketFix.ini").read_bytes() == cfg
         found = [v for v, h in TARGETS.items() if h.encode() in dll]
         assert found == [version], (version, "unexpected compiled hash set", found)
-        assert f"{release_version}-ets2-{version}".encode() in dll
+        assert f"{release_version}-ets2-{version}".encode() + b"\0" in dll
         for forbidden in [b"cmf_call_cost", b"CMF_DIAGNOSTIC_CALLS", b"cmf_membership_entry_bridge",
                           b"spread_density", b"cmf_observation_runtime", b"cmf_internal_destination_bridge",
-                          b"CMF_RUNTIME_DIAGNOSTIC", b"CAP4_162_TOTAL", b"cap162_fixture"]:
+                          b"CMF_RUNTIME_DIAGNOSTIC", b"CAP4_162_TOTAL", b"cap162_fixture",
+                          b"CAP4 QUIESCENCE DEBUG", b"SUCCESS_AFTER_TRANSIENT_THREAD_EXIT",
+                          b"transient_open_thread_87_", b"QUIESCENCE_TOTAL"]:
             assert forbidden not in dll, forbidden
         export_names = exports(dll)
         text = notes(version, exe_hash).encode("utf-8")
@@ -336,136 +335,50 @@ The ZIP contains CargoMarketFix.dll, active CargoMarketFix.ini, this README,
 MIT LICENSE, and a disabled INI example. Verify DLL and ZIP with SHA256SUMS.txt.
 """
 
-def notes1619(exe_hash):
-    return f"""# ETS2 Cargo Market Fix v1.4.2 — ETS2 1.61.1.9
+def notes_quiescence(version, exe_hash):
+    release = RELEASE_VERSIONS[version]
+    return f"""# ETS2 Cargo Market Fix v{release} — ETS2 {version}
 
-**Only ETS2 1.61.1.9, Windows x64. Native telemetry DLL, not an .scs mod.**
+**Only exact ETS2 {version}, Windows x64.** Runtime `{release}-ets2-{version}`.
 
 Required eurotrucks2.exe SHA256: `{exe_hash}`
 
-Runtime version: `1.4.2-ets2-1.61.1.9`. This is an exact-build compatibility
-port with unchanged fix semantics. Other known and unknown executable builds
-fail closed. Previous releases, including 1.61.1.1, remain unchanged.
+## Startup installation fix
 
-## Behavior and installation
+A thread can exit after Windows captures the thread snapshot and before the
+plugin opens that thread. The previous version refused installation in this
+case. The new guard tolerates only `OpenThread` returning
+`ERROR_INVALID_PARAMETER` (87). It keeps other threads suspended and requires
+a later complete snapshot with no new threads and no transient errors before
+patching. A reused thread ID is checked normally. The four-pass limit and
+all other fail-closed checks remain in effect.
 
-The supplied active INI enables **CAP4=4** and **Refresh Spread=1440 game minutes
-(24 game hours)**. Normal company refresh uses the existing balanced buckets.
-Bulk/sleep processing and direct trailer activation remain unspread.
+## Install
 
 Close ETS2 and back up your current DLL and INI. Copy **both CargoMarketFix.dll
-and CargoMarketFix.ini** from this exact-target ZIP into
-`Euro Truck Simulator 2/bin/win_x64/plugins/`. Do not mix target DLLs or reuse
-a diagnostic INI. To disable the patches, close the game and use the supplied
-disabled INI example as CargoMarketFix.ini, or remove the plugin.
+and CargoMarketFix.ini** into `Euro Truck Simulator 2/bin/win_x64/plugins/`.
+The active INI enables CAP4 at four attempts and spreads the normal company
+refresh over 1440 game minutes using the same balanced buckets. Bulk/sleep
+and direct activation are unspread. The executable hash gate, patch sites
+and save behavior are unchanged.
 
-Only production patch/lifecycle code is included. No historical observers,
-runtime diagnostics, membership instrumentation, accepted-vector changes,
-collectors, debug hooks or network telemetry are compiled into this DLL.
-The executable on disk is never edited.
+A company's normal refresh may be delayed by roughly 24 game hours, so
+offers may temporarily be fewer or less fresh. To disable the patches, close
+ETS2 and use the included disabled INI example or remove the DLL.
 
-## Trade-off
+## Validation
 
-Normal refresh at a company may be delayed by roughly 24 game hours. Offers
-may temporarily be fewer or less fresh. Initial activation can still take time.
-Time jumps and changing company lists are not a fixed-snapshot guarantee.
-No save format or persistent cache is added, but changed scheduling can affect
-offers later saved. Disabling the plugin does not recreate identical past offers.
+{qualification(version)}
 
-## Validation and limitations
-
-{qualification('1.61.1.9')}
-
-Fresh read-only analysis re-identified CAP4's candidate-count clamp, existing
-four-budget arm and attempt-loop consumer. It also verified the new normal
-sweep's exact signature, register ABI, empty/body continuations, and separate
-bulk/refill/activation routes. The existing quiesced two-byte CAP4 backend and
-v161 empty-list bridge remain appropriate; neither algorithm was redesigned.
-Native/offline tests cover exact-target isolation, 1440 arithmetic, low/high/empty
-counts, register/FP/stack preservation, fault/unwind paths, quiescence,
-install/restore, rollback and containment.
-
-The earlier smaller-map live diagnostic A/B runs on 1.61.1.1 are historical
-context only. This new exact target has **not** been launched or gameplay-tested.
-See [VALIDATION.md](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/VALIDATION.md)
-for the focused evidence and qualification limits.
+Focused regression checks cover stabilization, thread ID reuse, refusal and
+cleanup, exact CAP4 install and restore, and the Spread1440 lifecycle.
+See [VALIDATION.md](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/VALIDATION.md).
+The production DLL contains no debug blocks or observer hooks.
 
 ## Integrity
 
-The ZIP contains CargoMarketFix.dll, active CargoMarketFix.ini, this README,
-MIT LICENSE and the disabled INI example. Verify the DLL and ZIP using this
-release's SHA256SUMS.txt. No private logs, captures or research files are included.
-"""
-
-def notes162(exe_hash):
-    return f"""# ETS2 Cargo Market Fix v1.5.0 — ETS2 1.62.1.0
-
-**Only exact ETS2 1.62.1.0, Windows x64. Native telemetry DLL, not an .scs mod.**
-
-Required eurotrucks2.exe SHA256: `{exe_hash}`
-
-Runtime version: `1.5.0-ets2-1.62.1.0`. The new game branch increments the
-fix's minor version. This is a compatibility port with the maintained fix
-algorithm unchanged. Other known and unknown executable builds fail closed.
-Previous releases and their assets remain available unchanged.
-
-## Maintained behavior and installation
-
-The supplied active INI enables **CAP4=4** and **Refresh Spread=1440 game minutes
-(24 game hours)**. The normal company sweep retains the current balanced,
-contiguous bucket distribution. Bulk/sleep and direct trailer activation remain
-unspread. There is no adaptive scheduler, membership cache or new persistence.
-
-Close ETS2 and back up your existing CargoMarketFix DLL and INI. Copy **both
-CargoMarketFix.dll and CargoMarketFix.ini** from this exact-target ZIP into
-`Euro Truck Simulator 2/bin/win_x64/plugins/`. Do not mix DLLs between targets
-or reuse a research INI. To disable the patches, close the game and use the
-supplied disabled example as CargoMarketFix.ini, or remove the plugin.
-
-The DLL contains only production functionality. Historical observers, runtime
-diagnostics, membership instrumentation, accepted-vector reads, collectors,
-debug hooks and network access are absent. Only the two SCS telemetry exports
-are provided. The game executable on disk is never edited.
-
-## Trade-offs
-
-A company's normal refresh may be delayed by roughly 24 game hours; offers may
-temporarily be fewer or less fresh. Complete-cycle coverage assumes a fixed list
-and all normal game minutes being processed, not a snapshot across time jumps
-or list changes. Activation can still take time. No save format or persistent
-cache changes, but changed refresh scheduling can affect offers later saved;
-removing the plugin does not recreate identical past offers. This is not a
-universal stutter/FPS guarantee.
-
-## Validation and limitations
-
-{qualification('1.62.1.0')}
-
-The 1.62 generator changed its local stack layout. Fresh analysis proved the
-new candidate-count source, original four/count/ten clamp, new budget slot,
-and actual attempt-loop consumer. A new exact CAP4 signature and authored
-native clamp fixture cover those changes. The existing quiesced two-byte write
-backend is retained, even though the new target address is aligned.
-
-The normal sweep was freshly decoded beyond signature matching: its live
-registers, original empty path, minute source, body/backedge/end, stack,
-flags and unwind assumptions still match the maintained v161 bridge. The
-balanced Spread1440 arithmetic is unchanged. Bulk and activation routes
-were separately verified to bypass the normal gate. Focused native tests cover
-counts around 1440, medium/high counts, remainders, minute wrap, bounded
-fallback, register/FP preservation, exact restore, rollback and containment.
-
-See [VALIDATION.md](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/VALIDATION.md)
-for counts and evidence. The earlier live diagnostic A/B results on 1.61.1.1
-are historical context only; this exact 1.62 target was not launched or tested
-in gameplay for this release.
-
-## Integrity
-
-Five intended files: CargoMarketFix.dll, active CargoMarketFix.ini, this README,
-MIT LICENSE, and the disabled INI example. Verify the DLL and ZIP against this
-release's SHA256SUMS.txt. No private captures, SDK/game files, or research tools
-are packaged.
+The ZIP contains the DLL, active INI, this README, MIT LICENSE and the
+disabled INI example. Verify both the DLL and ZIP with `SHA256SUMS.txt`.
 """
 
 if __name__ == "__main__":

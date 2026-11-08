@@ -1,0 +1,17 @@
+{
+  "target": "1.61.1.9",
+  "tag": "v1.4.3-ets2-1.61.1.9",
+  "executable_sha256": "B70C2357CC56EB5834EE47FEA3C60B2F2D4591383FF2AC479CFD3CD254301B8C",
+  "url": "https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.3-ets2-1.61.1.9",
+  "dll_version": "1.4.3-ets2-1.61.1.9",
+  "dll_bytes": 325632,
+  "dll_sha256": "8E799D5ADB28606F2F6198F9447CAF057FECAC696B9C4955BC4EC1F476FB4581",
+  "zip_name": "ETS2-CargoMarketFix-v1.4.3-ETS2-1.61.1.9.zip",
+  "zip_bytes": 163702,
+  "zip_sha256": "4E0513D569758B013E12399027F00C0E400B111C0C9A6A8DC1B6484F025976DF",
+  "exports": [
+    "scs_telemetry_init",
+    "scs_telemetry_shutdown"
+  ],
+  "qualification": "LIVE INSTALLATION FIX VALIDATED ON ETS2 1.61.1.9. An external Debug 2 run recovered from the reported OpenThread failure, installed CAP4, and activated Spread1440. The production DLL passed native and offline validation. The external result covers startup installation. Large-map gameplay performance and live shutdown were not validated by that run."
+}
