@@ -7,6 +7,9 @@
 namespace cmf {
 constexpr std::size_t kMaximumSuspendedThreads=256;
 constexpr unsigned kMaximumQuiescencePasses = 4;
+constexpr std::size_t kMaximumLoggedTransientThreadIds = 16;
+
+enum class OpenThread87Policy { refuse, confirm_in_later_snapshot };
 struct MemoryRange final {
     std::uintptr_t begin = 0;
     std::size_t size = 0;
@@ -26,10 +29,13 @@ struct QuiescencePass final {
     unsigned suspended;
     unsigned contexts_read;
     std::size_t suspended_total;
+    std::uint64_t transient_open_thread_87;
 };
 
 struct QuiescenceDebug final {
     std::array<QuiescencePass, kMaximumQuiescencePasses> passes;
+    std::uint64_t transient_open_thread_87_total;
+    std::array<DWORD, kMaximumLoggedTransientThreadIds> transient_thread_ids;
     unsigned snapshots_attempted;
     DWORD process_id;
     DWORD current_thread_id;
@@ -59,7 +65,8 @@ public:
 
     template <std::size_t Count>
     bool acquire(const std::array<MemoryRange, Count>& forbidden,
-                 const char*& reason, QuiescenceDebug* debug = nullptr) noexcept {
+                 const char*& reason, QuiescenceDebug* debug = nullptr,
+                 OpenThread87Policy open_thread_87 = OpenThread87Policy::refuse) noexcept {
         release();
         const DWORD process_id = GetCurrentProcessId();
         const DWORD current_thread_id = GetCurrentThreadId();
@@ -101,7 +108,7 @@ public:
                 release(debug);
                 return false;
             }
-            bool success = true, added = false;
+            bool success = true, added = false, saw_transient_exit = false;
             do {
                 if (counts) ++counts->entries_seen;
                 if (entry.th32OwnerProcessID != process_id) continue;
@@ -123,7 +130,22 @@ public:
                 HANDLE thread = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT |
                     THREAD_QUERY_INFORMATION, FALSE, entry.th32ThreadID);
                 if (!thread) {
-                    refuse("open_thread_failed", entry.th32ThreadID, debug ? GetLastError() : 0, true);
+                    const auto error = (debug || open_thread_87 == OpenThread87Policy::confirm_in_later_snapshot)
+                        ? GetLastError() : 0;
+                    if (open_thread_87 == OpenThread87Policy::confirm_in_later_snapshot &&
+                        error == ERROR_INVALID_PARAMETER) {
+                        saw_transient_exit = true;
+                        if (counts) {
+                            ++counts->transient_open_thread_87;
+                            const auto index = debug->transient_open_thread_87_total++;
+                            if (index < debug->transient_thread_ids.size())
+                                debug->transient_thread_ids[static_cast<std::size_t>(index)] = entry.th32ThreadID;
+                        }
+                        // Keep the existing suspensions. A failed TID stays unseen,
+                        // so a replacement with that ID must pass the usual checks.
+                        continue;
+                    }
+                    refuse("open_thread_failed", entry.th32ThreadID, error, true);
                     success = false;
                     break;
                 }
@@ -180,7 +202,7 @@ public:
             }
             CloseHandle(snapshot);
             if (!success) { release(debug); return false; }
-            if (pass != 0 && !added) {
+            if (pass != 0 && !added && !saw_transient_exit) {
                 if (debug) debug->stable = true;
                 return true;
             }

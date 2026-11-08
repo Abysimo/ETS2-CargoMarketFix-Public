@@ -84,7 +84,8 @@ bool Site::prepare() noexcept {
 }
 
 void Site::log_prepatch_quiescence(Logger& log, MemoryRange image,
-                                   const fix_builds::Descriptor& build) const noexcept {
+                                   const fix_builds::Descriptor& build,
+                                   bool patch_installed) const noexcept {
     const auto& debug = quiescence_debug_;
     if (quiesced_ || !debug.snapshots_attempted || !debug.released ||
         (!debug.stable && !debug.failure_reason)) return;
@@ -92,11 +93,40 @@ void Site::log_prepatch_quiescence(Logger& log, MemoryRange image,
         const auto pass_index = debug.snapshots_attempted - 1;
         const auto& last_pass = debug.passes[pass_index];
         std::ostringstream message;
+        const auto write_recovery_details = [&] {
+            const auto total = debug.transient_open_thread_87_total;
+            const auto logged_ids = total < debug.transient_thread_ids.size()
+                ? total : debug.transient_thread_ids.size();
+            message << "\ntotal_snapshot_passes=" << debug.snapshots_attempted
+                    << "\nstabilization_pass=";
+            if (debug.stable) message << pass_index;
+            else message << "not_available";
+            message << "\nsuccess_required_transient_recovery=" << std::boolalpha
+                    << (debug.stable && total != 0)
+                    << "\nfinal_suspended_total=" << last_pass.suspended_total
+                    << "\npatch_installed=" << patch_installed
+                    << "\ntransient_open_thread_87_total=" << total
+                    << "\ntransient_open_thread_87_by_pass=";
+            for (unsigned i = 0; i < debug.snapshots_attempted; ++i) {
+                if (i != 0) message << ',';
+                message << i << ':' << debug.passes[i].transient_open_thread_87;
+            }
+            message << "\ntransient_thread_ids=";
+            if (!logged_ids) message << "none";
+            for (std::size_t i = 0; i < logged_ids; ++i) {
+                if (i != 0) message << ',';
+                message << debug.transient_thread_ids[i];
+            }
+            message << "\ntransient_thread_ids_omitted=" << total - logged_ids;
+        };
         if (debug.stable) {
-            message << "CAP4 quiescence debug: SUCCESS; passes=" << debug.snapshots_attempted
+            message << "CAP4 quiescence debug: "
+                    << (debug.transient_open_thread_87_total ? "SUCCESS_AFTER_TRANSIENT_THREAD_EXIT" : "SUCCESS")
+                    << "; passes=" << debug.snapshots_attempted
                     << "; process_threads=" << last_pass.process_threads_seen
                     << "; suspended=" << last_pass.suspended_total
                     << "; stable_pass=" << pass_index;
+            write_recovery_details();
             log.write(message.str());
             return;
         }
@@ -158,6 +188,7 @@ void Site::log_prepatch_quiescence(Logger& log, MemoryRange image,
                     << " contexts_read=" << pass.contexts_read
                     << " suspended_total=" << pass.suspended_total;
         }
+        write_recovery_details();
         message << "\n=== CAP4 QUIESCENCE DEBUG END ===";
         log.write(message.str());
     } catch (...) {
@@ -190,7 +221,7 @@ bool Cap4Patch::start(const PluginConfig& config,bool exact_build,Logger& log,co
         build->cap4_original,build->cap4_write_strategy);
     const bool installed = controller_.install(true,*site_);
     site_->log_prepatch_quiescence(log,
-        {reinterpret_cast<std::uintptr_t>(base), image_size}, *build);
+        {reinterpret_cast<std::uintptr_t>(base), image_size}, *build, installed);
     if(!installed){
         log.write(std::string("CAP4 installation refused: ")+controller_.reason());return false;
     }

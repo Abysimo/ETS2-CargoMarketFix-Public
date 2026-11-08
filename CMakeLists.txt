@@ -26,7 +26,7 @@ if(NOT CMF_ETS2_TARGET STREQUAL "1.61.1.9")
 endif()
 function(cmf_release_profile target)
     target_compile_definitions(${target} PRIVATE
-        CMF_RELEASE_TARGET=163 CMF_RELEASE_VERSION="1.4.2-debug1-ets2-1.61.1.9")
+        CMF_RELEASE_TARGET=163 CMF_RELEASE_VERSION="1.4.2-debug2-ets2-1.61.1.9")
 endfunction()
 add_library(CargoMarketFix SHARED ${CMF_CORE} src/main.cpp src/CargoMarketFix.def)
 cmf_target(CargoMarketFix)
