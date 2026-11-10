@@ -1,4 +1,4 @@
-# ETS2 Cargo Market Fix v1.5.1
+# ETS2 Cargo Market Fix v1.5.2
 
 **Choose the release matching your EXACT ETS2 version. Each DLL accepts only that
 release's executable hash. Do not mix DLLs between game versions.**
@@ -13,6 +13,7 @@ release's executable hash. Do not mix DLLs between game versions.**
 | 1.61.1.1 | [v1.4.1-ets2-1.61.1.1](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.1-ets2-1.61.1.1) | Live runtime diagnostically verified; large-map freeze reduction untested |
 | 1.61.1.9 | [v1.4.3-ets2-1.61.1.9](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.3-ets2-1.61.1.9) | Live installation fix validated via Debug 2 |
 | 1.62.1.0 | [v1.5.1-ets2-1.62.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.1-ets2-1.62.1.0) | Structurally validated. Shared startup fix live-validated on 1.61.1.9 |
+| 1.62.2.1 | [v1.5.2-ets2-1.62.2.1](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.2-ets2-1.62.2.1) | Structurally validated. No physical gameplay test on this exact build |
 
 Each release has one ZIP, one matching DLL, and SHA256SUMS.txt. Exact executable
 hashes and artifact checksums are in its notes. Other known versions and unknown
@@ -48,12 +49,20 @@ thread snapshot and `OpenThread`. The guard tolerates only error 87 from
 `OpenThread` and still needs a later clean snapshot within four passes.
 Other failures still fail closed. CAP4, the balanced bucket algorithm,
 bulk/sleep and direct activation routes, and save behavior are unchanged.
+Version 1.5.2 retains the guard and adds exact ETS2 1.62.2.1 compatibility.
 
 180-minute spreading could still cluster many expensive regenerations in one
 game-minute update. 1440 lowers the maximum company entries per normal slice.
 This is not proof that time of day causes the issue and not a GPU/FPS optimization.
 
 ## Validation and limits
+
+**1.62.2.1 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**
+Required executable SHA256: `8F17D3505C2E6C25A93F38A1119FFBBCCFBA6A3BE2EDDA3771E0186276AD9434`.
+Runtime `1.5.2-ets2-1.62.2.1` is a Windows x64 native telemetry DLL. Fresh
+exact-image checks proved the relocated CAP4 budget branch, the normal Spread
+gate and ABI, and separate bulk and activation routes. Native and offline
+checks passed. The startup recovery evidence below applies to ETS2 1.61.1.9.
 
 **1.62.1.0 — STRUCTURALLY VALIDATED / SHARED QUIESCENCE FIX LIVE-VALIDATED ON 1.61.1.9.**
 Required eurotrucks2.exe SHA256: `A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956`.

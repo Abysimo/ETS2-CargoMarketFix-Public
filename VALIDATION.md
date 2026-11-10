@@ -1,5 +1,49 @@
 # Release snapshot validation
 
+## v1.5.2 for exact ETS2 1.62.2.1
+
+**STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**
+
+The Windows x64 executable is 53,747,088 bytes and has FileVersion and
+ProductVersion 1.62.2.1. Required SHA256 is
+`8F17D3505C2E6C25A93F38A1119FFBBCCFBA6A3BE2EDDA3771E0186276AD9434`.
+The release DLL uses runtime `1.5.2-ets2-1.62.2.1` and accepts only that hash.
+All earlier descriptors and releases are retained.
+
+Fresh disassembly identifies the current-trailer generator family at
+`0x7BB9C0–0x7BC723`. The builder writes the output-vector count used by
+the generator at `[RSP+70h]`. The existing floor/count/ceiling clamp writes
+`[RSP+78h]` and the attempt counter compares it at `0x7BC4E7`. The
+aligned whole JAE at `0x7BBC28` changes from `73 0B` to `90 90` using
+`quiesced_copy2` and selects the original four-attempt arm. Its complete
+70-byte signature matches the earlier 1.62 clamp and is unique at the new site.
+
+The normal sweep is `0x4A5B70–0x4A6000` with gate `0x4A5F57` and exact
+span `48 3B C7 74 18 0F 1F 40 00`. The `v161_empty_rcx_rbp` ABI is
+RAX=begin, RCX=count, RBX=cursor, RDI=end, RBP=economy and unsigned
+minute at `[RBP+19Ch]`. Body/backedge/empty exit are
+`0x4A5F60/0x4A5F72/0x4A5F74`. The post-loop path restores cursor/end,
+incoming flags are dead on both paths, and the caller stack matches
+the existing bridge. The compiled bridge code and unwind sections match v1.5.1.
+The new rel32 `0x00313BB5` reaches expiry `0x7B9B20`, then refill
+`0x7B9BC0` and the generator. Bulk/sleep calls expiry at `0x4A7116` on the
+full range. Direct activation calls refill and generator at
+`0x5BF2CD/0x5BF2D8` and bypasses the normal gate as well.
+
+Balanced Spread1440, CAP4=4, exact-build refusal, and save behavior carry
+forward. The production quiescence guard also carries forward byte for byte.
+Error 87 from `OpenThread` leaves the failed ID unseen and retains existing
+suspensions until a clean follow-up snapshot or refusal at the four-pass
+limit. Other errors remain fatal. Tests cover ID reuse, patch-before-thaw,
+rollback, containment, and empty/below/equal/above-1440 buckets with remainders
+and minute wrap. The 1.61.1.9 external startup evidence applies to that build.
+
+Private validation passed 42 exact-image checks, 510 native and lifecycle
+checks, including 15 recovery cases and 1,000 copy2 install and restore cycles,
+and 21 production host checks. The public build passed 452 checks across
+10 focused suites. The release DLL exports only `scs_telemetry_init` and
+`scs_telemetry_shutdown` and contains production functionality only.
+
 ## v1.4.3 / v1.5.1 transient thread exit recovery
 
 The external Debug 1 run on exact ETS2 1.61.1.9 reached CAP4 target validation,

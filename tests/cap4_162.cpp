@@ -12,14 +12,14 @@ static void check(bool ok,const char* name) {
 }
 int main(){try {
     using namespace cmf;
-    const auto& build=fix_builds::ets162;
+    const auto& build=fix_builds::ets1622;
     check(fix_builds::identify(build.sha256)==&build&&fix_builds::known(&build)&&
-        !fix_builds::identify("1.62.1.0"),"exact_descriptor_no_version_wildcard");
+        !fix_builds::identify("1.62.2.1"),"exact_descriptor_no_version_wildcard");
     check(!(build.cap4&1)&&!(reinterpret_cast<std::uintptr_t>(&cap162_site)&1)&&
         build.cap4_write_strategy==fix_builds::Cap4WriteStrategy::quiesced_copy2,
         "aligned_target_retains_quiesced_copy2");
-    check(build.cap4_signature_size==70&&
-        !std::memcmp(&cap162_site-19,build.cap4_signature,70),"exact_70_byte_new_stack_clamp");
+    check(build.cap4_signature_size==70&&build.cap4_signature==fix_builds::ets162.cap4_signature&&
+        !std::memcmp(&cap162_site-19,build.cap4_signature,70),"exact_70_byte_shared_162_clamp");
     check(std::memcmp(&cap162_site-19,fix_builds::ets1619.cap4_signature,64)!=0,
         "old_stack_signature_is_not_reused");
     const std::uint64_t inputs[]{0,1,3,4,5,9,10,11,100,10000,UINT64_MAX};

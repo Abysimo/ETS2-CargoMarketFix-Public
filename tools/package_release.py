@@ -17,9 +17,12 @@ TARGETS = {
     "1.61.1.1": "2014BFCC850A06108F4CA3C233A5BB6D31D7D83346C5D449F94C8E0675E5199A",
     "1.61.1.9": "B70C2357CC56EB5834EE47FEA3C60B2F2D4591383FF2AC479CFD3CD254301B8C",
     "1.62.1.0": "A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956",
+    "1.62.2.1": "8F17D3505C2E6C25A93F38A1119FFBBCCFBA6A3BE2EDDA3771E0186276AD9434",
 }
 ROOT = Path(__file__).resolve().parents[1]
-RELEASE_VERSIONS = {"1.62.1.0": "1.5.1", "1.61.1.9": "1.4.3", "1.61.1.1": "1.4.1"}
+RELEASE_VERSIONS = {
+    "1.62.2.1": "1.5.2", "1.62.1.0": "1.5.1", "1.61.1.9": "1.4.3", "1.61.1.1": "1.4.1",
+}
 
 def sha(data):
     return hashlib.sha256(data).hexdigest().upper()
@@ -50,6 +53,11 @@ def exports(data):
     return sorted(result)
 
 def qualification(version):
+    if version == "1.62.2.1":
+        return ("STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD. "
+                "The exact executable passed read-only semantic checks, and the plugin passed "
+                "native and offline checks. The transient-thread recovery has external startup "
+                "evidence on ETS2 1.61.1.9 via Debug 2. That evidence applies to the older target.")
     if version == "1.62.1.0":
         return ("STRUCTURALLY VALIDATED / SHARED QUIESCENCE FIX LIVE-VALIDATED ON 1.61.1.9. "
                 "This release retains the prior exact-image proof for 1.62.1.0 and passed new "
@@ -85,6 +93,8 @@ def qualification(version):
             "validation is claimed." + extra)
 
 def notes(version, exe_hash):
+    if version == "1.62.2.1":
+        return notes_1622(exe_hash)
     if version in {"1.61.1.9", "1.62.1.0"}:
         return notes_quiescence(version, exe_hash)
     if version == "1.61.1.1":
@@ -379,6 +389,48 @@ The production DLL contains no debug blocks or observer hooks.
 
 The ZIP contains the DLL, active INI, this README, MIT LICENSE and the
 disabled INI example. Verify both the DLL and ZIP with `SHA256SUMS.txt`.
+"""
+
+def notes_1622(exe_hash):
+    version = "1.62.2.1"
+    release = RELEASE_VERSIONS[version]
+    return f"""# ETS2 Cargo Market Fix v{release} — ETS2 {version}
+
+**Exact ETS2 {version}, Windows x64.** Native telemetry DLL with runtime
+`{release}-ets2-{version}`.
+
+Required eurotrucks2.exe SHA256: `{exe_hash}`
+
+## Compatibility
+
+The new exact descriptor uses the re-identified CAP4 branch and the verified
+normal-sweep ABI. CAP4 selects the existing four-attempt arm. Refresh Spread
+uses the same balanced buckets across 1440 game minutes. Bulk/sleep and direct
+activation remain unspread. The shared guard retains the narrow recovery for
+`OpenThread` error 87 and still requires a later clean snapshot within four
+passes. Other quiescence failures and unsupported executable hashes fail closed.
+
+## Install
+
+Close ETS2 and back up your current DLL and INI. Copy both **CargoMarketFix.dll**
+and **CargoMarketFix.ini** to `Euro Truck Simulator 2/bin/win_x64/plugins/`.
+Both patches are active in the supplied INI. A company's normal refresh may
+be delayed by roughly 24 game hours, so offers may be fewer or less fresh.
+To disable both patches, close ETS2 and use the disabled INI example or remove
+the plugin.
+
+## Validation
+
+{qualification(version)}
+
+The release DLL contains production functionality only. See
+[VALIDATION.md](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/blob/main/VALIDATION.md)
+for exact sites, bridge proof and regression coverage.
+
+## Integrity
+
+The ZIP contains the DLL, active INI, this README, MIT LICENSE and the disabled
+INI example. Verify both the DLL and ZIP with `SHA256SUMS.txt`.
 """
 
 if __name__ == "__main__":

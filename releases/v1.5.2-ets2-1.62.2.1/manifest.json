@@ -1,0 +1,17 @@
+{
+  "target": "1.62.2.1",
+  "tag": "v1.5.2-ets2-1.62.2.1",
+  "executable_sha256": "8F17D3505C2E6C25A93F38A1119FFBBCCFBA6A3BE2EDDA3771E0186276AD9434",
+  "url": "https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.2-ets2-1.62.2.1",
+  "dll_version": "1.5.2-ets2-1.62.2.1",
+  "dll_bytes": 325632,
+  "dll_sha256": "78F32F072E3BC8CD06953462454FA3531750A609EF031BA5C29FE42EFEC87B01",
+  "zip_name": "ETS2-CargoMarketFix-v1.5.2-ETS2-1.62.2.1.zip",
+  "zip_bytes": 163574,
+  "zip_sha256": "66B8710D366CD5AB99A7CD75DB7253EAFE19A32C206662525682D374EA7B652C",
+  "exports": [
+    "scs_telemetry_init",
+    "scs_telemetry_shutdown"
+  ],
+  "qualification": "STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD. The exact executable passed read-only semantic checks, and the plugin passed native and offline checks. The transient-thread recovery has external startup evidence on ETS2 1.61.1.9 via Debug 2. That evidence applies to the older target."
+}
