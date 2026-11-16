@@ -142,15 +142,34 @@ int main(){std::setvbuf(stdout,nullptr,_IONBF,0);try{
     cap4::Site invalid(f.target(),f.range(),0x0b73,static_cast<Strategy>(99));
     check(!invalid.prepare(),"unknown_strategy_refused");
     for(const auto* d:{&fix_builds::ets157,&fix_builds::ets158,&fix_builds::ets159})check(d->cap4_write_strategy==Strategy::aligned_atomic16,"supported_descriptor_remains_atomic16");
-    check(fix_builds::supported.size()==9&&fix_builds::ets160.cap4_write_strategy==Strategy::quiesced_copy2&&
+    check(fix_builds::supported.size()==10&&fix_builds::ets160.cap4_write_strategy==Strategy::quiesced_copy2&&
         fix_builds::ets161.cap4_write_strategy==Strategy::quiesced_copy2&&fix_builds::ets1611.cap4_write_strategy==Strategy::quiesced_copy2&&
         fix_builds::ets1619.cap4_write_strategy==Strategy::quiesced_copy2&&fix_builds::ets162.cap4_write_strategy==Strategy::quiesced_copy2&&
-        fix_builds::ets1622.cap4_write_strategy==Strategy::quiesced_copy2,"nine_exact_builds_160_1622_copy2");
+        fix_builds::ets1622.cap4_write_strategy==Strategy::quiesced_copy2&&
+        fix_builds::ets1623.cap4_write_strategy==Strategy::quiesced_copy2,"ten_exact_builds_160_1623_copy2");
     DWORD handles_before=0,handles_after=0;need(GetProcessHandleCount(GetCurrentProcess(),&handles_before)!=0,"handles before");
     for(unsigned i=0;i<1000;++i){cap4::Site s(f.target(),f.range(),0x0b73,Strategy::quiesced_copy2);Controller c;
         need(f.original()&&!s.quiesced(),"cycle start");
-        need(c.install(true,s)&&f.patched()&&!s.quiesced(),"cycle install");
-        need(c.stop(s)&&f.original()&&!s.quiesced()&&c.release_allowed()&&f.protection()==protection,"cycle restore");
+        const auto report_failure = [&](const char* step, bool operation_ok) {
+            const auto& patch = c.last_patch();
+            std::printf("COPY2 cycle=%u step=%s operation_ok=%d reason=%s freeze_reason=%s "
+                "phase=%s bytes=%s patched=%d original=%d quiesced=%d release_allowed=%d "
+                "write_attempted=%d cache_synchronized=%d protection=0x%lX expected=0x%lX\n",
+                i+1, step, operation_ok, c.reason(), s.freeze_reason ? s.freeze_reason : "none",
+                name(c.phase()), name(patch.after), f.patched(), f.original(), s.quiesced(),
+                c.release_allowed(), patch.write_attempted, patch.cache_synchronized,
+                f.protection(), protection);
+        };
+        const bool did_install = c.install(true,s);
+        if (!did_install || !f.patched() || s.quiesced()) {
+            report_failure("install",did_install);
+            need(false,"cycle install");
+        }
+        const bool did_restore = c.stop(s);
+        if (!did_restore || !f.original() || s.quiesced() || !c.release_allowed() || f.protection()!=protection) {
+            report_failure("restore",did_restore);
+            need(false,"cycle restore");
+        }
         if((i+1)%100==0)std::printf("STRESS_PROGRESS %u/1000\n",i+1);}
     check(f.original(),"1000_complete_native_cycles");
     need(GetProcessHandleCount(GetCurrentProcess(),&handles_after)!=0,"handles after");

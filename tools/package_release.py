@@ -18,10 +18,12 @@ TARGETS = {
     "1.61.1.9": "B70C2357CC56EB5834EE47FEA3C60B2F2D4591383FF2AC479CFD3CD254301B8C",
     "1.62.1.0": "A938CB388121F9B884A2E1B0F048C230A7BC19638EF6D641A70775F8C7FEA956",
     "1.62.2.1": "8F17D3505C2E6C25A93F38A1119FFBBCCFBA6A3BE2EDDA3771E0186276AD9434",
+    "1.62.3.3": "055EC5343D53BD427DE54B06ECA74937F0D348DBB0C5D71862EDDDCF45E2DB66",
 }
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE_VERSIONS = {
-    "1.62.2.1": "1.5.2", "1.62.1.0": "1.5.1", "1.61.1.9": "1.4.3", "1.61.1.1": "1.4.1",
+    "1.62.3.3": "1.5.3", "1.62.2.1": "1.5.2", "1.62.1.0": "1.5.1",
+    "1.61.1.9": "1.4.3", "1.61.1.1": "1.4.1",
 }
 
 def sha(data):
@@ -53,7 +55,7 @@ def exports(data):
     return sorted(result)
 
 def qualification(version):
-    if version == "1.62.2.1":
+    if version in {"1.62.2.1", "1.62.3.3"}:
         return ("STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD. "
                 "The exact executable passed read-only semantic checks, and the plugin passed "
                 "native and offline checks. The transient-thread recovery has external startup "
@@ -93,8 +95,8 @@ def qualification(version):
             "validation is claimed." + extra)
 
 def notes(version, exe_hash):
-    if version == "1.62.2.1":
-        return notes_1622(exe_hash)
+    if version in {"1.62.2.1", "1.62.3.3"}:
+        return notes_162_patch(version, exe_hash)
     if version in {"1.61.1.9", "1.62.1.0"}:
         return notes_quiescence(version, exe_hash)
     if version == "1.61.1.1":
@@ -391,8 +393,7 @@ The ZIP contains the DLL, active INI, this README, MIT LICENSE and the
 disabled INI example. Verify both the DLL and ZIP with `SHA256SUMS.txt`.
 """
 
-def notes_1622(exe_hash):
-    version = "1.62.2.1"
+def notes_162_patch(version, exe_hash):
     release = RELEASE_VERSIONS[version]
     return f"""# ETS2 Cargo Market Fix v{release} — ETS2 {version}
 

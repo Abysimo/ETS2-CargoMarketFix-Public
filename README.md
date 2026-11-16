@@ -1,4 +1,4 @@
-# ETS2 Cargo Market Fix v1.5.2
+# ETS2 Cargo Market Fix v1.5.3
 
 **Choose the release matching your EXACT ETS2 version. Each DLL accepts only that
 release's executable hash. Do not mix DLLs between game versions.**
@@ -14,6 +14,7 @@ release's executable hash. Do not mix DLLs between game versions.**
 | 1.61.1.9 | [v1.4.3-ets2-1.61.1.9](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.4.3-ets2-1.61.1.9) | Live installation fix validated via Debug 2 |
 | 1.62.1.0 | [v1.5.1-ets2-1.62.1.0](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.1-ets2-1.62.1.0) | Structurally validated. Shared startup fix live-validated on 1.61.1.9 |
 | 1.62.2.1 | [v1.5.2-ets2-1.62.2.1](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.2-ets2-1.62.2.1) | Structurally validated. No physical gameplay test on this exact build |
+| 1.62.3.3 | [v1.5.3-ets2-1.62.3.3](https://github.com/Abysimo/ETS2-CargoMarketFix-Public/releases/tag/v1.5.3-ets2-1.62.3.3) | Structurally validated. No physical gameplay test on this exact build |
 
 Each release has one ZIP, one matching DLL, and SHA256SUMS.txt. Exact executable
 hashes and artifact checksums are in its notes. Other known versions and unknown
@@ -49,13 +50,20 @@ thread snapshot and `OpenThread`. The guard tolerates only error 87 from
 `OpenThread` and still needs a later clean snapshot within four passes.
 Other failures still fail closed. CAP4, the balanced bucket algorithm,
 bulk/sleep and direct activation routes, and save behavior are unchanged.
-Version 1.5.2 retains the guard and adds exact ETS2 1.62.2.1 compatibility.
+Version 1.5.3 retains the guard and adds exact ETS2 1.62.3.3 compatibility.
 
 180-minute spreading could still cluster many expensive regenerations in one
 game-minute update. 1440 lowers the maximum company entries per normal slice.
 This is not proof that time of day causes the issue and not a GPU/FPS optimization.
 
 ## Validation and limits
+
+**1.62.3.3 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**
+Required executable SHA256 is `055EC5343D53BD427DE54B06ECA74937F0D348DBB0C5D71862EDDDCF45E2DB66`.
+Runtime `1.5.3-ets2-1.62.3.3` is a Windows x64 native telemetry DLL.
+Read-only inspection verified the relocated CAP4 and Spread sites, the
+existing bridge ABI, and the separate bulk and activation routes.
+Native and offline checks passed.
 
 **1.62.2.1 — STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD.**
 Required executable SHA256: `8F17D3505C2E6C25A93F38A1119FFBBCCFBA6A3BE2EDDA3771E0186276AD9434`.

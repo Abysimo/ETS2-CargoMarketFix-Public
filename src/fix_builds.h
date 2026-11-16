@@ -143,6 +143,18 @@ inline constexpr Descriptor ets1622{
     cap4_162_signature.data(),cap4_162_signature.size(),0x0b73,
     Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v161_empty_rcx_rbp,
     {spread_1622_signature.data(),spread_1622_signature.size(),24,40}};
+inline constexpr auto spread_1623_signature=[] {
+    auto s=spread_1622_signature;
+    s[40]=0xc5;
+    return s;
+}();
+inline constexpr Descriptor ets1623{
+    "1.62.3.3", "055EC5343D53BD427DE54B06ECA74937F0D348DBB0C5D71862EDDDCF45E2DB66",
+    0x007BBC78,0x007BBA10,0x007BC773,
+    0x004A5F97,0x004A5BB0,0x004A6040,0x00313BC5,0x004A7156,0x007B9BA8,
+    cap4_162_signature.data(),cap4_162_signature.size(),0x0b73,
+    Cap4WriteStrategy::quiesced_copy2,SpreadBridgeStrategy::v161_empty_rcx_rbp,
+    {spread_1623_signature.data(),spread_1623_signature.size(),24,40}};
 // Release profiles restrict BOTH hash recognition and descriptor ownership.
 // The unscoped table remains available to private builds and maintenance tests.
 #if defined(CMF_RELEASE_TARGET)
@@ -164,11 +176,13 @@ inline constexpr std::array supported{&ets1619};
 inline constexpr std::array supported{&ets162};
 #elif CMF_RELEASE_TARGET == 165
 inline constexpr std::array supported{&ets1622};
+#elif CMF_RELEASE_TARGET == 166
+inline constexpr std::array supported{&ets1623};
 #else
 #error Unsupported CMF_RELEASE_TARGET
 #endif
 #else
-inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160,&ets161,&ets1611,&ets1619,&ets162,&ets1622};
+inline constexpr std::array supported{&ets157,&ets158,&ets159,&ets160,&ets161,&ets1611,&ets1619,&ets162,&ets1622,&ets1623};
 #endif
 inline const Descriptor* identify(std::string_view hash) noexcept {
     for(const auto* d:supported)if(hash==d->sha256)return d;

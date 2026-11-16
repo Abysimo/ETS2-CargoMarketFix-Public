@@ -7,24 +7,24 @@ convention without rewriting any older release.
 
 ## Build profiles
 
-The current target is `v1.5.2-ets2-1.62.2.1`. It retains the shared startup
+The current target is `v1.5.3-ets2-1.62.3.3`. It retains the shared startup
 fix from `v1.5.1-ets2-1.62.1.0` and `v1.4.3-ets2-1.61.1.9`.
 Previous releases and diagnostic prereleases retain their own source tags,
 files and qualifications.
 Supported exact profiles: 1.57.2.7, 1.58.1.4, 1.59.1.3, 1.60.1.7,
-1.61.1.0, 1.61.1.1, 1.61.1.9, 1.62.1.0, 1.62.2.1. Game updates within the same branch increment
+1.61.1.0, 1.61.1.1, 1.61.1.9, 1.62.1.0, 1.62.2.1, 1.62.3.3. Game updates within the same branch increment
 the fix PATCH; a new game branch increments MINOR and resets PATCH. MAJOR is retained.
 
 Configure a separate output directory per target, for example:
 
 ```text
-cmake -S . -B build/v152/1.62.2.1 -A x64 "-DCMF_ETS2_TARGET=1.62.2.1" "-DSCS_SDK_INCLUDE_DIR=<local-sdk-include>"
-cmake --build build/v152/1.62.2.1 --config Release
+cmake -S . -B build/v153/1.62.3.3 -A x64 "-DCMF_ETS2_TARGET=1.62.3.3" "-DSCS_SDK_INCLUDE_DIR=<local-sdk-include>"
+cmake --build build/v153/1.62.3.3 --config Release
 ```
 
 The target macro restricts both hash recognition and descriptor ownership to one
 descriptor. Runtime metadata names that exact target. Maintenance tests deliberately
-retain the nine-descriptor table to validate cross-target metadata. The separately
+retain the ten-descriptor table to validate cross-target metadata. The separately
 compiled scope test uses the same profile definitions as its DLL.
 
 Enable CMF_BUILD_TESTS and supply CMF_GAME_EXE as read-only input for maintenance.
@@ -34,7 +34,7 @@ historical executables. Keep gameplay qualification separate from native validat
 
 ## Package and publish
 
-Run `python tools/package_release.py --target 1.62.2.1 --build-root build/v152`
+Run `python tools/package_release.py --target 1.62.3.3 --build-root build/v153`
 after the exact-target build and validation. This writes only the selected target's
 package/notes/checksums and leaves historical releases untouched. Omitting `--target`
 packages every configured target and should not be used merely to add a new port.
@@ -57,6 +57,9 @@ releases. If partially published, report exactly what is live and stop on failur
 do not delete successful releases automatically.
 
 ## Qualification
+
+1.62.3.3 v1.5.3 is **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**.
+The exact image, native fixtures, and offline production scope were checked.
 
 1.62.2.1 v1.5.2 is **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**.
 Read-only exact-image checks and new native and offline validation passed.

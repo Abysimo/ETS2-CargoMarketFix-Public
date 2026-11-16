@@ -1,5 +1,52 @@
 # Release snapshot validation
 
+## v1.5.3 for exact ETS2 1.62.3.3
+
+**STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**
+
+The Windows x64 executable is 53,747,600 bytes with FileVersion and
+ProductVersion 1.62.3.3. Its required SHA256 is
+`055EC5343D53BD427DE54B06ECA74937F0D348DBB0C5D71862EDDDCF45E2DB66`.
+Runtime `1.5.3-ets2-1.62.3.3` accepts only this executable hash.
+
+The current-trailer generator family is `0x7BBA10–0x7BC773`. Its builder
+writes the vector count, which the generator loads into `[RSP+70h]`.
+The floor/count/ceiling clamp writes the budget to `[RSP+78h]`. The
+attempt counter compares that value at `0x7BC537`. CAP4 changes the
+complete aligned JAE at `0x7BBC78` from `73 0B` to `90 90` using
+`quiesced_copy2`. The replacement selects the original four-attempt arm.
+The existing 70-byte clamp signature is unique at the relocated site.
+
+The normal sweep family is `0x4A5BB0–0x4A6040`. Its nine-byte gate
+at `0x4A5F97` is `48 3B C7 74 18 0F 1F 40 00`. Fresh checks verified
+`v161_empty_rcx_rbp` with RAX=begin, RCX=count, RBX=cursor, RDI=end,
+RBP=economy, and unsigned minute at `[RBP+19Ch]`. The body, backedge, and
+empty exit are `0x4A5FA0`, `0x4A5FB2`, and `0x4A5FB4`. The caller
+restores cursor and end, and neither exit depends on incoming flags.
+The new rel32 is `0x00313BC5` to expiry `0x7B9B70`, which calls refill
+and the generator. Bulk/sleep calls expiry on the original full range
+at `0x4A7156`. Direct activation calls refill and the generator at
+`0x5BF30D` and `0x5BF318` without going through the Spread gate.
+
+The same four-pass quiescence guard allows only `OpenThread` error 87
+to continue to a later clean snapshot. Existing suspensions are retained
+and a reused ID receives the ordinary checks. Other errors fail closed.
+The earlier external startup result applies to exact ETS2 1.61.1.9.
+
+The port passed 42 read-only exact-image checks, 488 private native checks,
+22 offline production host checks, and 467 checks across ten public suites.
+Coverage includes the 15 recovery cases, ten-descriptor isolation,
+register/stack/FP preservation, rollback, containment, and all 1440 bucket
+residues for counts below, at, and above 1440. The compiled bridge code and
+unwind sections match v1.5.2. The production DLL exports only
+`scs_telemetry_init` and `scs_telemetry_shutdown`.
+
+The separate copy2 stress run first stopped with a generic restore failure
+after 400 completed cycles. The test now reports the failure state without
+relaxing any assertion. A follow-up completed all 1,000 cycles and passed all
+37 checks, including handle and page-protection checks. The first failure
+did not recur and its cause was not established.
+
 ## v1.5.2 for exact ETS2 1.62.2.1
 
 **STRUCTURALLY VALIDATED / NO PHYSICAL GAMEPLAY TEST PERFORMED ON THIS EXACT BUILD**

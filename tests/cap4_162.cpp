@@ -12,9 +12,9 @@ static void check(bool ok,const char* name) {
 }
 int main(){try {
     using namespace cmf;
-    const auto& build=fix_builds::ets1622;
+    const auto& build=fix_builds::ets1623;
     check(fix_builds::identify(build.sha256)==&build&&fix_builds::known(&build)&&
-        !fix_builds::identify("1.62.2.1"),"exact_descriptor_no_version_wildcard");
+        !fix_builds::identify("1.62.3.3"),"exact_descriptor_no_version_wildcard");
     check(!(build.cap4&1)&&!(reinterpret_cast<std::uintptr_t>(&cap162_site)&1)&&
         build.cap4_write_strategy==fix_builds::Cap4WriteStrategy::quiesced_copy2,
         "aligned_target_retains_quiesced_copy2");
